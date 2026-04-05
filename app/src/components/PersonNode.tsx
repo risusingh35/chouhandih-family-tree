@@ -20,18 +20,18 @@ interface PersonNodeProps {
 // ─── Palette (matches AddChildModal) ─────────────────────────────────────────
 
 const C = {
-  cream:    "#fffdf8",
-  parchment:"#fdf6ec",
-  sand:     "#ddd4c5",
-  warm100:  "rgba(201,169,110,0.15)",
-  warm200:  "rgba(201,169,110,0.35)",
-  gold:     "#c9a96e",
-  oak:      "#a8845a",
-  umber:    "#7a5c35",
-  bark:     "#2c1f0e",
-  muted:    "#9a8570",
-  female:   "#c97a8a",   // dusty rose
-  male:     "#6a8fa8",   // slate blue
+  cream: "#fffdf8",
+  parchment: "#fdf6ec",
+  sand: "#ddd4c5",
+  warm100: "rgba(201,169,110,0.15)",
+  warm200: "rgba(201,169,110,0.35)",
+  gold: "#c9a96e",
+  oak: "#a8845a",
+  umber: "#7a5c35",
+  bark: "#2c1f0e",
+  muted: "#9a8570",
+  female: "#c97a8a", // dusty rose
+  male: "#6a8fa8", // slate blue
   deceased: "#b0a898",
 };
 
@@ -39,11 +39,11 @@ const C = {
 
 const ACTIONS = [
   { key: "viewDetails", icon: "👁", label: "View Details" },
-  { key: "addChild",    icon: "＋", label: "Add Child"    },
-  { key: "showKids",    icon: "⌄",  label: "Show Children"},
+  { key: "addChild", icon: "＋", label: "Add Child" },
+  { key: "showKids", icon: "⌄", label: "Show Children" },
 ] as const;
 
-type ActionKey = typeof ACTIONS[number]["key"];
+type ActionKey = (typeof ACTIONS)[number]["key"];
 
 // ─── PersonCard ───────────────────────────────────────────────────────────────
 
@@ -57,8 +57,8 @@ const PersonCard = ({
   isActive: boolean;
 }) => {
   const [imgError, setImgError] = useState(false);
-  const isFemale   = person.gender === "F";
-  const ringColor  = isFemale ? C.female : C.male;
+  const isFemale = person.gender === "F";
+  const ringColor = isFemale ? C.female : C.male;
   const isDeceased = !person.isAlive || !!person.death;
 
   return (
@@ -125,7 +125,13 @@ const PersonCard = ({
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             ) : (
-              <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden>
+              <svg
+                width="30"
+                height="30"
+                viewBox="0 0 30 30"
+                fill="none"
+                aria-hidden
+              >
                 <circle cx="15" cy="10" r="6" fill={ringColor} opacity="0.5" />
                 <path
                   d="M5 26c0-5.523 4.477-10 10-10s10 4.477 10 10"
@@ -243,7 +249,8 @@ const ActionPopup = ({
       background: `linear-gradient(160deg, ${C.cream} 0%, ${C.parchment} 100%)`,
       border: `1px solid ${C.sand}`,
       borderRadius: 14,
-      boxShadow: "0 10px 30px rgba(44,31,14,0.18), 0 2px 6px rgba(44,31,14,0.08)",
+      boxShadow:
+        "0 10px 30px rgba(44,31,14,0.18), 0 2px 6px rgba(44,31,14,0.08)",
       padding: "8px",
       display: "flex",
       flexDirection: "column",
@@ -302,8 +309,11 @@ const ActionPopup = ({
             (e.currentTarget as HTMLButtonElement).style.color = C.umber;
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-            (e.currentTarget as HTMLButtonElement).style.color = isToggled ? C.umber : C.bark;
+            (e.currentTarget as HTMLButtonElement).style.background =
+              "transparent";
+            (e.currentTarget as HTMLButtonElement).style.color = isToggled
+              ? C.umber
+              : C.bark;
           }}
         >
           <span
@@ -322,11 +332,7 @@ const ActionPopup = ({
           >
             {key === "showKids" && isToggled ? "⌃" : icon}
           </span>
-          {key === "showKids"
-            ? isToggled
-              ? "Hide Children"
-              : label
-            : label}
+          {key === "showKids" ? (isToggled ? "Hide Children" : label) : label}
         </button>
       );
     })}
@@ -335,7 +341,7 @@ const ActionPopup = ({
 
 // ─── Connector Lines ──────────────────────────────────────────────────────────
 
-const STEM_H = 28;   // px — vertical drop from parent to children bar
+const STEM_H = 28; // px — vertical drop from parent to children bar
 const LINE_COLOR = C.sand;
 const LINE_W = 1.5;
 
@@ -347,9 +353,9 @@ const PersonNode = ({
   depth = 0,
   hasStem = false,
 }: PersonNodeProps) => {
-  const [showActions, setShowActions]     = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const [childrenVisible, setChildrenVisible] = useState(false);
-  const [isModalOpen, setModalOpen]       = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
   const [isAddChildOpen, setAddChildOpen] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -365,22 +371,19 @@ const PersonNode = ({
     return () => document.removeEventListener("mousedown", handle);
   }, [showActions]);
 
-  const handleAction = useCallback(
-    (key: ActionKey) => {
-      setShowActions(false);
-      if (key === "viewDetails") setModalOpen(true);
-      if (key === "addChild")    setAddChildOpen(true);
-      if (key === "showKids")    setChildrenVisible((v) => !v);
-    },
-    []
-  );
+  const handleAction = useCallback((key: ActionKey) => {
+    setShowActions(false);
+    if (key === "viewDetails") setModalOpen(true);
+    if (key === "addChild") setAddChildOpen(true);
+    if (key === "showKids") setChildrenVisible((v) => !v);
+  }, []);
 
   const handleAddChildSave = useCallback(
     (child: Person) => {
       onAddPerson(person.id, child);
       setChildrenVisible(true);
     },
-    [person.id, onAddPerson]
+    [person.id, onAddPerson],
   );
 
   // Spouse of this person (first spouse for display)
@@ -414,7 +417,12 @@ const PersonNode = ({
       {/* Couple row */}
       <div
         ref={nodeRef}
-        style={{ display: "flex", alignItems: "flex-start", gap: 0, position: "relative" }}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 0,
+          position: "relative",
+        }}
       >
         {/* This person's card */}
         <div style={{ position: "relative" }}>
@@ -446,7 +454,9 @@ const PersonNode = ({
                 marginTop: -8,
               }}
             >
-              <div style={{ width: 16, height: LINE_W, background: LINE_COLOR }} />
+              <div
+                style={{ width: 16, height: LINE_W, background: LINE_COLOR }}
+              />
               <div
                 style={{
                   width: 18,
@@ -464,13 +474,15 @@ const PersonNode = ({
               >
                 ♥
               </div>
-              <div style={{ width: 16, height: LINE_W, background: LINE_COLOR }} />
+              <div
+                style={{ width: 16, height: LINE_W, background: LINE_COLOR }}
+              />
             </div>
 
             {/* Spouse card */}
             <PersonCard
               person={spouse as PersonNodeType}
-              onClick={() => {}}  // spouse has its own node at root level
+              onClick={() => {}} // spouse has its own node at root level
               isActive={false}
             />
           </>
@@ -513,7 +525,8 @@ const PersonNode = ({
                   background: LINE_COLOR,
                   // cover full span
                   width: `calc(100% - ${100 / sharedChildren.length}%)`,
-                  transform: "translateX(calc(50% / " + sharedChildren.length + "))",
+                  transform:
+                    "translateX(calc(50% / " + sharedChildren.length + "))",
                 }}
               />
             )}
