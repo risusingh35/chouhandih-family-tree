@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GroupSelectPage from "./src/components/GroupSelectPage";
 import FamilyTreeView from "./src/components/Familytreeview";
 import personsData from "../public/data/family.json";
@@ -28,73 +28,23 @@ const Breadcrumb = ({
   selection: Selection;
   onBack: () => void;
 }) => (
-  <div
-    style={{
-      position: "fixed",
-      bottom: 24,
-      left: 24,
-      zIndex: 800,
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      padding: "9px 14px",
-      borderRadius: 12,
-      background: "rgba(253,246,236,0.92)",
-      backdropFilter: "blur(10px)",
-      WebkitBackdropFilter: "blur(10px)",
-      border: `1px solid ${C.sand}`,
-      boxShadow: "0 4px 16px rgba(44,31,14,0.12)",
-      fontFamily: "'DM Sans', sans-serif",
-      fontSize: 12,
-      animation: "bc-in 0.3s ease forwards",
-    }}
-  >
-    <style>{`@keyframes bc-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
+  <div className="bc-container">
     <button
       type="button"
       onClick={onBack}
       aria-label="Back to clan selection"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 5,
-        padding: "5px 10px",
-        borderRadius: 8,
-        border: `1.5px solid ${C.sand}`,
-        background: "transparent",
-        color: C.umber,
-        cursor: "pointer",
-        fontFamily: "'DM Sans', sans-serif",
-        fontSize: 12,
-        fontWeight: 600,
-        transition: "background 0.15s",
-      }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.background = "rgba(201,169,110,0.12)")
-      }
-      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      className="bc-back-btn"
     >
       ← Clans
     </button>
-    <span aria-hidden style={{ color: C.sand }}>
-      ·
-    </span>
-    <span
-      style={{ color: C.muted, fontWeight: 500, textTransform: "capitalize" }}
-    >
-      {selection.groupId}
-    </span>
-    <span aria-hidden style={{ color: C.gold }}>
-      ›
-    </span>
-    <span
-      style={{
-        color: C.bark,
-        fontWeight: 700,
-        textTransform: "capitalize",
-        letterSpacing: "0.02em",
-      }}
-    >
+
+    <span className="bc-separator">·</span>
+
+    <span className="bc-group">{selection.groupId}</span>
+
+    <span className="bc-arrow">›</span>
+
+    <span className="bc-clan">
       {selection.clanId.charAt(0).toUpperCase() + selection.clanId.slice(1)}
     </span>
   </div>
@@ -102,6 +52,19 @@ const Breadcrumb = ({
 
 export default function HomePage() {
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [selectedFamilyGroup, setSelectedFamilyGroup] = useState<Person[]>(
+    [],
+  );
+
+  useEffect(() => {
+    if (!selection) return;
+    console.log("selection-----------------------", selection);
+    const selectedPersons = (personsData as any)[selection.groupId][
+      selection.clanId
+    ];
+    setSelectedFamilyGroup(selectedPersons||[]);
+    console.log("selectedPersons-----------------------", selectedPersons);
+  }, [selection]);
 
   if (!selection) {
     return (
@@ -113,9 +76,10 @@ export default function HomePage() {
 
   return (
     <>
+      {console.log("selection-----------------------", selection)}
       <FamilyTreeView
-        initialPersons={personsData.persons as Person[]}
-        storageKey={`family-tree-${selection.groupId}-${selection.clanId}`}
+        initialPersons={selectedFamilyGroup as Person[]}
+        groupSelection={selection}
       />
       <Breadcrumb selection={selection} onBack={() => setSelection(null)} />
     </>

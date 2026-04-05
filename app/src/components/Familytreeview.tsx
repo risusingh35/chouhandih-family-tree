@@ -13,7 +13,7 @@ import {
 
 interface FamilyTreeViewProps {
   initialPersons: Person[];
-  storageKey?: string;
+  groupSelection: {};
 }
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -54,24 +54,24 @@ async function saveToServer(persons: Person[]): Promise<boolean> {
   }
 }
 
-function saveToLocalStorage(key: string, persons: Person[]): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(persons));
-  } catch {
-    /* ignore */
-  }
-}
+// function saveToLocalStorage(key: string, persons: Person[]): void {
+//   try {
+//     localStorage.setItem(key, JSON.stringify(persons));
+//   } catch {
+//     /* ignore */
+//   }
+// }
 
-function loadFromLocalStorage(key: string, fallback: Person[]): Person[] {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    const parsed = JSON.parse(raw) as Person[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : fallback;
-  } catch {
-    return fallback;
-  }
-}
+// function loadFromLocalStorage(key: string, fallback: Person[]): Person[] {
+//   try {
+//     const raw = localStorage.getItem(key);
+//     if (!raw) return fallback;
+//     const parsed = JSON.parse(raw) as Person[];
+//     return Array.isArray(parsed) && parsed.length > 0 ? parsed : fallback;
+//   } catch {
+//     return fallback;
+//   }
+// }
 
 function downloadJSON(persons: Person[]): void {
   const blob = new Blob([JSON.stringify({ persons }, null, 2)], {
@@ -377,44 +377,47 @@ const JSONDrawer = ({ persons }: { persons: Person[] }) => {
 
 const FamilyTreeView = ({
   initialPersons,
-  storageKey = "family-tree-data",
+  groupSelection,
 }: FamilyTreeViewProps) => {
-  const [persons, setPersons] = useState<Person[]>(() =>
-    loadFromLocalStorage(storageKey, initialPersons),
-  );
+  const [persons, setPersons] = useState<Person[]>(initialPersons);
+  // const [persons, setPersons] = useState<Person[]>(() =>
+  //   // loadFromLocalStorage('storageKey', initialPersons),
+  // setPersons(initialPersons)
+  // );
+
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [toast, setToast] = useState<ToastState | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isFirstRender = useRef(true);
 
-  const tree: PersonNodeType | null = buildTree(persons);
+  const tree: PersonNodeType | null = buildTree(initialPersons);
 
   // ── Persist on every change ────────────────────────────────────────────────
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+  // useEffect(() => {
+  //   if (isFirstRender.current) {
+  //     isFirstRender.current = false;
+  //     return;
+  //   }
 
-    // Immediate localStorage write (fast fallback)
-    saveToLocalStorage(storageKey, persons);
+  //   // Immediate localStorage write (fast fallback)
+  //   saveToLocalStorage('storageKey', persons);
 
-    // Async write to public/data/family.json via API route
-    setSaveStatus("saving");
-    saveToServer(persons).then((ok) => {
-      if (ok) {
-        setSaveStatus("saved");
-        setTimeout(() => setSaveStatus("idle"), 3000);
-      } else {
-        setSaveStatus("error");
-        setToast({
-          msg: "Could not write to family.json — is the dev server running?",
-          variant: "error",
-        });
-      }
-    });
-  }, [persons, storageKey]);
+  //   // Async write to public/data/family.json via API route
+  //   setSaveStatus("saving");
+  //   saveToServer(persons).then((ok) => {
+  //     if (ok) {
+  //       setSaveStatus("saved");
+  //       setTimeout(() => setSaveStatus("idle"), 3000);
+  //     } else {
+  //       setSaveStatus("error");
+  //       setToast({
+  //         msg: "Could not write to family.json — is the dev server running?",
+  //         variant: "error",
+  //       });
+  //     }
+  //   });
+  // }, [persons]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   const handleAddPerson = useCallback((parentId: string, child: Person) => {

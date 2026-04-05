@@ -26,9 +26,9 @@ export interface Group {
 // ─── Vansh badge colors ───────────────────────────────────────────────────────
 
 export const VANSH_COLOR: Record<Vansh, { bg: string; text: string; border: string }> = {
-  Agnivanshi:    { bg: "rgba(200,80,50,0.1)",  text: "#9b3a20", border: "rgba(200,80,50,0.3)"  },
+  Agnivanshi: { bg: "rgba(200,80,50,0.1)", text: "#9b3a20", border: "rgba(200,80,50,0.3)" },
   Chandravanshi: { bg: "rgba(60,100,160,0.1)", text: "#1e4a80", border: "rgba(60,100,160,0.3)" },
-  Suryavanshi:   { bg: "rgba(190,140,30,0.1)", text: "#7a5a00", border: "rgba(190,140,30,0.3)" },
+  Suryavanshi: { bg: "rgba(190,140,30,0.1)", text: "#7a5a00", border: "rgba(190,140,30,0.3)" },
 };
 
 // ─── Groups ───────────────────────────────────────────────────────────────────
@@ -43,18 +43,6 @@ export const GROUPS: Group[] = [
       "The Rajputs (राजपूत) are the Kshatriya warrior clans of North and Central India, tracing their lineage through three sacred Vanshas — Suryavanshi (Solar), Chandravanshi (Lunar), and Agnivanshi (Fire). Select your clan below.",
     clans: [
       {
-        id: "chouhan",
-        name: "Chouhan",
-        altName: "Chahamana · चौहान",
-        vansh: "Agnivanshi",
-        origin: "Sambhar & Ajmer, Rajasthan",
-        kuldevi: "Ashapura Mata",
-        description:
-          "Founded by Manik Rao Chauhan in 685 AD. Rulers of Ajmer and Delhi, their greatest king Prithviraj Chauhan was the last Hindu Emperor of Delhi.",
-        subclans: ["Hada", "Songara", "Bhadauriya", "Khichi", "Nirban", "Dhanetiya", "Devda"],
-        accent: "#8c3a1a",
-      },
-      {
         id: "jadon",
         name: "Jadon",
         altName: "Jadaun · जादों",
@@ -66,6 +54,19 @@ export const GROUPS: Group[] = [
         subclans: ["Jadeja", "Bhatti"],
         accent: "#1e4a7a",
       },
+      {
+        id: "chouhan",
+        name: "Chouhan",
+        altName: "Chahamana · चौहान",
+        vansh: "Agnivanshi",
+        origin: "Sambhar & Ajmer, Rajasthan",
+        kuldevi: "Ashapura Mata",
+        description:
+          "Founded by Manik Rao Chauhan in 685 AD. Rulers of Ajmer and Delhi, their greatest king Prithviraj Chauhan was the last Hindu Emperor of Delhi.",
+        subclans: ["Hada", "Songara", "Bhadauriya", "Khichi", "Nirban", "Dhanetiya", "Devda"],
+        accent: "#8c3a1a",
+      },
+
       {
         id: "bhadauriya",
         name: "Bhadauriya",

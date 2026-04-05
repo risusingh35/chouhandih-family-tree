@@ -212,3 +212,88 @@
     transform: translateX(-50%) translateY(0) scale(1);
   }
 }
+/* ───────── Breadcrumb Container ───────── */
+.bc-container {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 800;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 14px;
+  border-radius: 12px;
+
+  background: rgba(253, 246, 236, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid #ddd4c5;
+  box-shadow: 0 4px 16px rgba(44, 31, 14, 0.12);
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+
+  animation: bc-in 0.3s ease forwards;
+}
+
+/* ───────── Back Button ───────── */
+.bc-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 5px 10px;
+  border-radius: 8px;
+
+  border: 1.5px solid #ddd4c5;
+  background: transparent;
+  color: #7a5c35;
+
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+
+  transition: background 0.15s;
+}
+
+.bc-back-btn:hover {
+  background: rgba(201, 169, 110, 0.12);
+}
+
+/* ───────── Text Elements ───────── */
+.bc-separator {
+  color: #ddd4c5;
+}
+
+.bc-group {
+  color: #9a8570;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.bc-arrow {
+  color: #c9a96e;
+}
+
+.bc-clan {
+  color: #2c1f0e;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+/* ───────── Animation ───────── */
+@keyframes bc-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
