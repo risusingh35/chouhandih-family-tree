@@ -82,7 +82,7 @@ const PersonCard = ({
       </div>
 
       <span className="pn-name">{person.name}</span>
-      <span className="pn-dob">b. {person.dob}</span>
+      <span className="pn-dob">DOB {person.dob}</span>
     </button>
   );
 };

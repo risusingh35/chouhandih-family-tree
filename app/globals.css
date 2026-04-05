@@ -11,12 +11,12 @@
   align-items: flex-start;
   position: relative;
 }
-
 .pn-popup-wrapper {
   position: relative;
-  overflow: visible !important;
+  display: inline-flex; /* 🔥 prevents expansion */
+  align-items: center;
+  justify-content: center;
 }
-
 /* ───────── Card ───────── */
 .pn-card {
   all: unset;
@@ -106,21 +106,22 @@
 /* ───────── Popup ───────── */
 .pn-popup {
   position: absolute;
-  top: -112px;
   left: 50%;
-  transform: translateX(-50%);
+  bottom: 50px;
+  transform: translateX(-50%) translateY(-8px);
+  z-index: 9999;
+  pointer-events: auto;
+  isolation: isolate; /* prevents layout bleed */
   background: linear-gradient(160deg, #fffdf8, #fdf6ec);
   border: 1px solid #ddd4c5;
   border-radius: 14px;
   padding: 8px;
-  z-index: 9999;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 152px;
+  width: 155px;
   animation: pn-popup-in 0.18s ease;
 }
-
 .pn-popup-arrow {
   position: absolute;
   bottom: -6px;
