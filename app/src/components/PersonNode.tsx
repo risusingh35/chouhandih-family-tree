@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import PersonModal from "../modal/PersonModal";
 import AddChildModal from "../modal/AddChildModal";
-import type { PersonNode as PersonNodeType, Person } from "../utils/buildTree";
+import type { PersonNode as PersonNodeType, Person, ParentId } from "../types";
 import "../../globals.css";
 
 // ─── Palette (unchanged) ─────────────────────────────────
@@ -35,7 +35,7 @@ const ACTIONS = [
 type ActionKey = (typeof ACTIONS)[number]["key"];
 interface PersonNodeProps {
   person: PersonNodeType;
-  onAddPerson: (parentId: string, child: Person) => void;
+  onAddPerson: (parentId: ParentId, child: Person) => void;
   depth?: number;
   hasStem?: boolean;
 }
@@ -228,7 +228,7 @@ const PersonNode = ({
       <AddChildModal
         isOpen={isAddChildOpen}
         onClose={() => setAddChildOpen(false)}
-        parentId={person.id}
+        parentId={person?.id || null}
         onSave={handleAddChildSave}
       />
     </div>

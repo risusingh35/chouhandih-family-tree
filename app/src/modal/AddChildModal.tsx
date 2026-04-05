@@ -2,48 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback, useId } from "react";
 import { v4 as uuidv4 } from "uuid";
-
+import type {
+  FormData,
+  ChildNode,
+  FormErrors,
+  AddChildModalProps,
+} from "../types";
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface ChildNode {
-  id: string;
-  name: string;
-  gender: "M" | "F";
-  photo: string;
-  dob: string;
-  death: string;
-  isMarried: boolean;
-  spouse: string[];
-  isAlive: boolean;
-  parents: string[];
-  children: string[];
-  childrenData: ChildNode[];
-  spouseData: unknown[];
-}
-
-interface FormData {
-  name: string;
-  gender: "M" | "F";
-  photo: string;
-  dob: string;
-  death: string;
-  isMarried: boolean;
-  spouse: string[];
-  isAlive: boolean;
-}
-
-interface FormErrors {
-  name?: string;
-  dob?: string;
-  death?: string;
-}
-
-interface AddChildModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  parentId: string;
-  onSave: (child: ChildNode) => void;
-}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -242,8 +207,9 @@ const AddChildModal = ({
     const newChild: ChildNode = {
       id: uuidv4(),
       ...form,
-      parents: [parentId],
+      parents: parentId ? [parentId] : null,
       children: [],
+      isApproved: false,
       childrenData: [],
       spouseData: [],
     };

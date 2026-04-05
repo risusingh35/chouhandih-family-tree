@@ -2,13 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import PersonNode from "./PersonNode";
-import {
-  buildTree,
-  addChildToPersons,
-  type Person,
-  type PersonNode as PersonNodeType,
-} from "../utils/buildTree";
-
+import { buildTree, addChildToPersons } from "../utils/buildTree";
+import AddChildModal from "../modal/AddChildModal";
+import type { ParentId, Person, PersonNode as PersonNodeType } from "../types";
+import { saveFamily } from "../utils/saveFamily";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FamilyTreeViewProps {
@@ -380,6 +377,8 @@ const FamilyTreeView = ({
   groupSelection,
 }: FamilyTreeViewProps) => {
   const [persons, setPersons] = useState<Person[]>(initialPersons);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isAddChildOpen, setAddChildOpen] = useState(false);
   // const [persons, setPersons] = useState<Person[]>(() =>
   //   // loadFromLocalStorage('storageKey', initialPersons),
   // setPersons(initialPersons)
@@ -405,28 +404,39 @@ const FamilyTreeView = ({
 
   //   // Async write to public/data/family.json via API route
   //   setSaveStatus("saving");
-  //   saveToServer(persons).then((ok) => {
-  //     if (ok) {
-  //       setSaveStatus("saved");
-  //       setTimeout(() => setSaveStatus("idle"), 3000);
-  //     } else {
-  //       setSaveStatus("error");
-  //       setToast({
-  //         msg: "Could not write to family.json — is the dev server running?",
-  //         variant: "error",
-  //       });
-  //     }
-  //   });
+  // saveToServer(persons).then((ok) => {
+  //   if (ok) {
+  //     setSaveStatus("saved");
+  //     setTimeout(() => setSaveStatus("idle"), 3000);
+  //   } else {
+  //     setSaveStatus("error");
+  //     setToast({
+  //       msg: "Could not write to family.json — is the dev server running?",
+  //       variant: "error",
+  //     });
+  //   }
+  // });
   // }, [persons]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
-  const handleAddPerson = useCallback((parentId: string, child: Person) => {
-    setPersons((prev) => addChildToPersons(prev, parentId, child));
-    setToast({
-      msg: `${child.name} added to the family tree`,
-      variant: "success",
-    });
-  }, []);
+  const handleAddPerson = useCallback(
+    (parentId: ParentId, child: Person) => {
+      setPersons((prev) => addChildToPersons(prev, parentId, child));
+      setToast({
+        msg: `${child.name} added to the family tree`,
+        variant: "success",
+      });
+      saveFamily(addChildToPersons(persons, null, child)).then((ok) => {
+        if (!ok) {
+          setToast({
+            msg: "Failed to save changes to family.json",
+            variant: "error",
+          });
+        }
+      });
+    },
+    [],
+  );
 
   const handleExport = useCallback(() => {
     downloadJSON(persons);
@@ -444,6 +454,25 @@ const FamilyTreeView = ({
     setImportError(null);
     fileInputRef.current?.click();
   };
+  const addFamilyDataClick = () => {
+    setModalOpen(true);
+    setAddChildOpen(true);
+  };
+
+  const handleAddChildSave = useCallback((child: Person) => {
+    console.log("child-----------------", child);
+
+    setModalOpen(false);
+    setAddChildOpen(false);
+    saveFamily(addChildToPersons(persons, null, child)).then((ok) => {
+      if (!ok) {
+        setToast({
+          msg: "Failed to save changes to family.json",
+          variant: "error",
+        });
+      }
+    });
+  }, []);
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -729,7 +758,7 @@ const FamilyTreeView = ({
               </p>
               <button
                 type="button"
-                onClick={handleImportClick}
+                onClick={addFamilyDataClick}
                 style={{
                   marginTop: 8,
                   padding: "10px 20px",
@@ -743,7 +772,7 @@ const FamilyTreeView = ({
                   fontWeight: 600,
                 }}
               >
-                Import JSON
+                Add Family Data
               </button>
             </div>
           )}
@@ -753,6 +782,12 @@ const FamilyTreeView = ({
       </div>
 
       {toast && <Toast toast={toast} onDone={() => setToast(null)} />}
+      <AddChildModal
+        isOpen={isAddChildOpen}
+        onClose={() => setAddChildOpen(false)}
+        parentId={null}
+        onSave={handleAddChildSave}
+      />
     </>
   );
 };

@@ -1,23 +1,10 @@
 // utils/buildTree.ts
 
-export interface Person {
-  id: string;
-  name: string;
-  gender: "M" | "F";
-  photo: string;
-  dob: string;
-  death: string | null;
-  isMarried: boolean;
-  isAlive: boolean;
-  spouse: string[];
-  parents: string[];
-  children: string[];
-}
+import type { ParentId, Person, PersonNode } from "../types";
 
-export interface PersonNode extends Person {
-  childrenData: PersonNode[];
-  spouseData: PersonNode[];
-}
+
+
+
 
 export function buildTree(persons: Person[]): PersonNode | null {
   if (!persons.length) return null;
@@ -64,7 +51,7 @@ export function upsertPerson(persons: Person[], incoming: Person): Person[] {
 /** Add a child: insert the child node and append its id to the parent's children list */
 export function addChildToPersons(
   persons: Person[],
-  parentId: string,
+  parentId: ParentId,
   child: Person
 ): Person[] {
   const withChild = upsertPerson(persons, child);

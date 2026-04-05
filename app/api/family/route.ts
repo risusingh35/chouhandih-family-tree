@@ -1,38 +1,55 @@
-// app/api/family/route.ts
+// app/api/items/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { PersonModel, IPerson } from "../../lib/models/Family";
+import { createDoc, getDocs } from "../../lib/crud";
+import type { ApiResponse } from "../../lib/type/api";
 
-const FILE_PATH = path.join(process.cwd(), "public", "data", "family.json");
-
-// GET /api/family — read current file
-export async function GET() {
+// ── GET /api/items ────────────────────────────────────────────────────────────
+export async function GET(request: NextRequest) {
   try {
-    const raw = await fs.readFile(FILE_PATH, "utf-8");
-    return NextResponse.json(JSON.parse(raw));
-  } catch {
-    return NextResponse.json({ persons: [] }, { status: 200 });
+    const { searchParams } = new URL(request.url);
+
+    const isActiveParam = searchParams.get("isActive");
+    const limit = Number(searchParams.get("limit")) || 100;
+    const skip = Number(searchParams.get("skip")) || 0;
+
+    const filter: Record<string, unknown> = {};
+    if (isActiveParam !== null) filter.isActive = isActiveParam === "true";
+
+    const items = await getDocs(PersonModel, filter, { sort: { createdAt: -1 }, limit, skip });
+
+    return NextResponse.json<ApiResponse<typeof items>>(
+      { success: true, data: items },
+      { status: 200 }
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("GET /api/items:", message);
+    return NextResponse.json<ApiResponse<never>>(
+      { success: false, error: message },
+      { status: 500 }
+    );
   }
 }
 
-// POST /api/family — overwrite file with new persons array
-export async function POST(req: NextRequest) {
+// ── POST /api/items ───────────────────────────────────────────────────────────
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
+    const body: Partial<IPerson> = await request.json();
+    const item = await createDoc(PersonModel, body);
 
-    if (!Array.isArray(body?.persons)) {
-      return NextResponse.json(
-        { error: "Body must be { persons: [...] }" },
-        { status: 400 }
-      );
-    }
-
-    const content = JSON.stringify({ persons: body.persons }, null, 2);
-    await fs.writeFile(FILE_PATH, content, "utf-8");
-
-    return NextResponse.json({ ok: true, count: body.persons.length });
-  } catch (err) {
-    console.error("[family/route] write error:", err);
-    return NextResponse.json({ error: "Failed to write file" }, { status: 500 });
+    return NextResponse.json<ApiResponse<typeof item>>(
+      { success: true, data: item },
+      { status: 201 }
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    const isValidation = (error as { name?: string }).name === "ValidationError";
+    console.error("POST /api/items:", message);
+    return NextResponse.json<ApiResponse<never>>(
+      { success: false, error: message },
+      { status: isValidation ? 400 : 500 }
+    );
   }
 }
