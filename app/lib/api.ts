@@ -1,7 +1,7 @@
 // lib/api.ts
 // Typed client-side fetch helpers — use in components / server components
 
-import type { IItem } from "./models/Family";
+import {  IPerson } from "../lib/models/Family";
 import type { ApiResponse } from "./type/api";
 
 const BASE = "/api/items";
@@ -19,7 +19,7 @@ export interface FetchItemsOptions {
   isActive?: boolean;
 }
 
-export async function fetchItems(options: FetchItemsOptions = {}): Promise<IItem[]> {
+export async function fetchItems(options: FetchItemsOptions = {}): Promise<IPerson[]> {
   const { limit = 100, skip = 0, isActive } = options;
   const params = new URLSearchParams({
     limit: String(limit),
@@ -28,36 +28,36 @@ export async function fetchItems(options: FetchItemsOptions = {}): Promise<IItem
   if (isActive !== undefined) params.set("isActive", String(isActive));
 
   const res = await fetch(`${BASE}?${params}`);
-  return handleResponse<IItem[]>(res);
+  return handleResponse<IPerson[]>(res);
 }
 
 // ── READ ONE ──────────────────────────────────────────────────────────────────
-export async function fetchItem(id: string): Promise<IItem> {
+export async function fetchItem(id: string): Promise<IPerson> {
   const res = await fetch(`${BASE}/${id}`);
-  return handleResponse<IItem>(res);
+  return handleResponse<IPerson>(res);
 }
 
 // ── CREATE ────────────────────────────────────────────────────────────────────
-export async function createItem(payload: Partial<IItem>): Promise<IItem> {
+export async function createItem(payload: Partial<IPerson>): Promise<IPerson> {
   const res = await fetch(BASE, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  return handleResponse<IItem>(res);
+  return handleResponse<IPerson>(res);
 }
 
 // ── UPDATE ────────────────────────────────────────────────────────────────────
 export async function updateItem(
   id: string,
-  payload: Partial<IItem>
-): Promise<IItem> {
+  payload: Partial<IPerson>
+): Promise<IPerson> {
   const res = await fetch(`${BASE}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  return handleResponse<IItem>(res);
+  return handleResponse<IPerson>(res);
 }
 
 // ── DELETE ────────────────────────────────────────────────────────────────────
