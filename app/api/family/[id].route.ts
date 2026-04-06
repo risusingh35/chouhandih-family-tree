@@ -1,7 +1,7 @@
 // app/api/items/[id]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { Item, IItem } from "../../lib/models/Family";
+import { PersonModel, IPerson } from "../../lib/models/Family";
 import { getDocById, updateDoc, deleteDoc } from "../../lib/crud";
 import type { ApiResponse } from "../../lib/type/api";
 
@@ -15,7 +15,7 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const item = await getDocById(Item, params.id);
+    const item = await getDocById(PersonModel, params.id);
 
     if (!item) {
       return NextResponse.json<ApiResponse<never>>(
@@ -44,8 +44,8 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
-    const body: Partial<IItem> = await request.json();
-    const updated = await updateDoc(Item, params.id, body);
+    const body: Partial<IPerson> = await request.json();
+    const updated = await updateDoc(PersonModel, params.id, body);
 
     if (!updated) {
       return NextResponse.json<ApiResponse<never>>(
@@ -75,7 +75,7 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
-    const deleted = await deleteDoc(Item, params.id);
+    const deleted = await deleteDoc(PersonModel, params.id);
 
     if (!deleted) {
       return NextResponse.json<ApiResponse<never>>(
