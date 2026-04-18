@@ -1,7 +1,7 @@
 // app/api/items/[id]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { PersonModel, IPerson } from "../../lib/models/Family";
+import { PersonModel, IFamily } from "../../lib/models/Family";
 import { getDocById, updateDoc, deleteDoc } from "../../lib/crud";
 import type { ApiResponse } from "../../lib/type/api";
 
@@ -44,7 +44,7 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
-    const body: Partial<IPerson> = await request.json();
+    const body: Partial<IFamily> = await request.json();
     const updated = await updateDoc(PersonModel, params.id, body);
 
     if (!updated) {

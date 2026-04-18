@@ -53,7 +53,7 @@ const PersonModal = ({ person, isOpen, onClose }: Props) => {
           &times;
         </button>
 
-        {/* Person Details */}
+        {/* Family Details */}
         <div style={{ textAlign: "center" }}>
           <div
             style={{

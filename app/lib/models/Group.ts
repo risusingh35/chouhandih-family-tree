@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from "mongoose";
+import { Document, Schema, model, models } from "mongoose";
 
 export interface IGroup extends Document {
   slug: string;
@@ -23,4 +23,4 @@ const GroupSchema = new Schema<IGroup>(
 
 
 
-    export const Group = models.Group || model("Group", GroupSchema);
+export const Group = models.Group || model("Group", GroupSchema);

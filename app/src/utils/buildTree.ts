@@ -1,12 +1,6 @@
-// utils/buildTree.ts
+import type { ParentId, Family, PersonNode } from "../types";
 
-import type { ParentId, Person, PersonNode } from "../types";
-
-
-
-
-
-export function buildTree(persons: Person[]): PersonNode | null {
+export function buildTree(persons: Family[]): PersonNode | null {
   if (!persons.length) return null;
 
   const map: Record<string, PersonNode> = {};
@@ -40,7 +34,7 @@ export function buildTree(persons: Person[]): PersonNode | null {
 }
 
 /** Upsert a person into a flat persons array (add if new, replace if existing) */
-export function upsertPerson(persons: Person[], incoming: Person): Person[] {
+export function upsertPerson(persons: Family[], incoming: Family): Family[] {
   const idx = persons.findIndex((p) => p.id === incoming.id);
   if (idx === -1) return [...persons, incoming];
   const updated = [...persons];
@@ -50,10 +44,10 @@ export function upsertPerson(persons: Person[], incoming: Person): Person[] {
 
 /** Add a child: insert the child node and append its id to the parent's children list */
 export function addChildToPersons(
-  persons: Person[],
+  persons: Family[],
   parentId: ParentId,
-  child: Person
-): Person[] {
+  child: Family
+): Family[] {
   const withChild = upsertPerson(persons, child);
   return withChild.map((p) =>
     p.id === parentId

@@ -34,10 +34,10 @@ const VanshBadge = ({ vansh }: { vansh?: Vansh }) => {
 const ClanCard = ({ clan }: { clan: Clan }) => {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
-
+  if (!clan) return null;
   return (
     <button
-      onClick={() => router.push(`/clan/${clan.id}`)}
+      onClick={() => router.push(`/family?vanshId=${clan?.vansh?._id}`)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{

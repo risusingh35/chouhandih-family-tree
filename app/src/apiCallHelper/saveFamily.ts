@@ -1,6 +1,6 @@
-import type { Person } from "../types";
+import type { Family } from "../types";
 
-export async function saveFamily(persons: Person[]): Promise<boolean> {
+export async function saveFamily(persons: Family[]): Promise<boolean> {
     try {
         console.log("persons-------------", persons);
         const requestData = persons[0]

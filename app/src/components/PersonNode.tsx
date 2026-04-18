@@ -3,28 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import PersonModal from "../modal/PersonModal";
 import AddChildModal from "../modal/AddChildModal";
-import type { PersonNode as PersonNodeType, Person, ParentId } from "../types";
+import type { PersonNode as PersonNodeType, Family, ParentId } from "../types";
 import "../../globals.css";
-
-// ─── Palette (unchanged) ─────────────────────────────────
-
-const C = {
-  cream: "#fffdf8",
-  parchment: "#fdf6ec",
-  sand: "#ddd4c5",
-  warm100: "rgba(201,169,110,0.15)",
-  warm200: "rgba(201,169,110,0.35)",
-  gold: "#c9a96e",
-  oak: "#a8845a",
-  umber: "#7a5c35",
-  bark: "#2c1f0e",
-  muted: "#9a8570",
-  female: "#c97a8a",
-  male: "#6a8fa8",
-  deceased: "#b0a898",
-};
-
-// ─── Actions (unchanged) ─────────────────────────────────
 
 const ACTIONS = [
   { key: "viewDetails", icon: "👁", label: "View Details" },
@@ -35,7 +15,7 @@ const ACTIONS = [
 type ActionKey = (typeof ACTIONS)[number]["key"];
 interface PersonNodeProps {
   person: PersonNodeType;
-  onAddPerson: (parentId: ParentId, child: Person) => void;
+  onAddPerson: (parentId: ParentId, child: Family) => void;
   depth?: number;
   hasStem?: boolean;
 }
@@ -157,7 +137,7 @@ const PersonNode = ({
   }, []);
 
   const handleAddChildSave = useCallback(
-    (child: Person) => {
+    (child: Family) => {
       onAddPerson(person.id, child);
       setChildrenVisible(true);
     },

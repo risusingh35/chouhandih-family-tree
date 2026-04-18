@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import PersonNode from "./PersonNode";
 import { buildTree, addChildToPersons } from "../utils/buildTree";
 import AddChildModal from "../modal/AddChildModal";
-import type { ParentId, Person, PersonNode as PersonNodeType } from "../types";
+import type { ParentId, Family, PersonNode as PersonNodeType } from "../types";
 import { saveFamily } from "../apiCallHelper/saveFamily";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FamilyTreeViewProps {
-  initialPersons: Person[];
+  initialPersons: Family[];
   groupSelection: {};
 }
 
@@ -38,7 +38,7 @@ const C = {
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
-async function saveToServer(persons: Person[]): Promise<boolean> {
+async function saveToServer(persons: Family[]): Promise<boolean> {
   try {
     const res = await fetch("/api/family", {
       method: "POST",
@@ -51,7 +51,7 @@ async function saveToServer(persons: Person[]): Promise<boolean> {
   }
 }
 
-// function saveToLocalStorage(key: string, persons: Person[]): void {
+// function saveToLocalStorage(key: string, persons: Family[]): void {
 //   try {
 //     localStorage.setItem(key, JSON.stringify(persons));
 //   } catch {
@@ -59,18 +59,18 @@ async function saveToServer(persons: Person[]): Promise<boolean> {
 //   }
 // }
 
-// function loadFromLocalStorage(key: string, fallback: Person[]): Person[] {
+// function loadFromLocalStorage(key: string, fallback: Family[]): Family[] {
 //   try {
 //     const raw = localStorage.getItem(key);
 //     if (!raw) return fallback;
-//     const parsed = JSON.parse(raw) as Person[];
+//     const parsed = JSON.parse(raw) as Family[];
 //     return Array.isArray(parsed) && parsed.length > 0 ? parsed : fallback;
 //   } catch {
 //     return fallback;
 //   }
 // }
 
-function downloadJSON(persons: Person[]): void {
+function downloadJSON(persons: Family[]): void {
   const blob = new Blob([JSON.stringify({ persons }, null, 2)], {
     type: "application/json",
   });
@@ -257,7 +257,7 @@ const ToolbarButton = ({
 
 // ─── JSON Drawer ──────────────────────────────────────────────────────────────
 
-const JSONDrawer = ({ persons }: { persons: Person[] }) => {
+const JSONDrawer = ({ persons }: { persons: Family[] }) => {
   const [open, setOpen] = useState(false);
   const json = JSON.stringify({ persons }, null, 2);
 
@@ -376,10 +376,10 @@ const FamilyTreeView = ({
   initialPersons,
   groupSelection,
 }: FamilyTreeViewProps) => {
-  const [persons, setPersons] = useState<Person[]>(initialPersons);
+  const [persons, setPersons] = useState<Family[]>(initialPersons);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAddChildOpen, setAddChildOpen] = useState(false);
-  // const [persons, setPersons] = useState<Person[]>(() =>
+  // const [persons, setPersons] = useState<Family[]>(() =>
   //   // loadFromLocalStorage('storageKey', initialPersons),
   // setPersons(initialPersons)
   // );
@@ -419,7 +419,7 @@ const FamilyTreeView = ({
   // }, [persons]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
-  const handleAddPerson = useCallback((parentId: ParentId, child: Person) => {
+  const handleAddPerson = useCallback((parentId: ParentId, child: Family) => {
     setPersons((prev) => addChildToPersons(prev, parentId, child));
     setToast({
       msg: `${child.name} added to the family tree`,
@@ -456,7 +456,7 @@ const FamilyTreeView = ({
     setAddChildOpen(true);
   };
 
-  const handleAddChildSave = useCallback((child: Person) => {
+  const handleAddChildSave = useCallback((child: Family) => {
     console.log("child-----------------", child);
 
     setModalOpen(false);
@@ -479,7 +479,7 @@ const FamilyTreeView = ({
       reader.onload = (ev) => {
         try {
           const parsed = JSON.parse(ev.target?.result as string);
-          const arr: Person[] = parsed?.persons ?? parsed;
+          const arr: Family[] = parsed?.persons ?? parsed;
           if (!Array.isArray(arr) || !arr.length) throw new Error();
           setPersons(arr);
           setToast({

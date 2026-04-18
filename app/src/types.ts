@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-export interface Person {
+export interface Family {
     id: string;
     name: string;
     gender: "M" | "F";
@@ -29,7 +29,7 @@ export interface ChildNode {
     childrenData: ChildNode[];
     spouseData: unknown[];
 }
-export interface PersonNode extends Person {
+export interface PersonNode extends Family {
     childrenData: PersonNode[];
     spouseData: PersonNode[];
 }
@@ -101,6 +101,7 @@ export interface IGroup {
 }
 
 export interface Vansh {
+    _id: string;
     name: VanshName;
     slug: string;
     color: {

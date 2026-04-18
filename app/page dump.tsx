@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import GroupSelectPage from "./src/components/GroupSelectPage";
 import FamilyTreeView from "./src/components/Familytreeview";
 import personsData from "../public/data/family.json";
-import type { Person } from "./src/types";
+import type { Family } from "./src/types";
 
 interface Selection {
   groupId: string;
@@ -52,7 +52,7 @@ const Breadcrumb = ({
 
 export default function HomePage() {
   const [selection, setSelection] = useState<Selection | null>(null);
-  const [selectedFamilyGroup, setSelectedFamilyGroup] = useState<Person[]>([]);
+  const [selectedFamilyGroup, setSelectedFamilyGroup] = useState<Family[]>([]);
 
   useEffect(() => {
     if (!selection) return;
@@ -76,7 +76,7 @@ export default function HomePage() {
     <>
       {console.log("selection-----------------------", selection)}
       <FamilyTreeView
-        initialPersons={selectedFamilyGroup as Person[]}
+        initialPersons={selectedFamilyGroup as Family[]}
         groupSelection={selection}
       />
       <Breadcrumb selection={selection} onBack={() => setSelection(null)} />
