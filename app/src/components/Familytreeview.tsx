@@ -6,6 +6,7 @@ import { buildTree, addChildToPersons } from "../utils/buildTree";
 import AddChildModal from "../modal/AddChildModal";
 import type { ParentId, Family, PersonNode as PersonNodeType } from "../types";
 import { saveFamily } from "../apiCallHelper/saveFamily";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FamilyTreeViewProps {

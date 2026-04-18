@@ -1,215 +1,178 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import PersonModal from "../modal/PersonModal";
+import { useState, useCallback, useRef, useEffect } from "react";
 import AddChildModal from "../modal/AddChildModal";
 import type { PersonNode as PersonNodeType, Family, ParentId } from "../types";
-import "../../globals.css";
 
-const ACTIONS = [
-  { key: "viewDetails", icon: "👁", label: "View Details" },
-  { key: "addChild", icon: "＋", label: "Add Child" },
-  { key: "showKids", icon: "⌄", label: "Show Children" },
-] as const;
-
-type ActionKey = (typeof ACTIONS)[number]["key"];
-interface PersonNodeProps {
+interface Props {
   person: PersonNodeType;
-  onAddPerson: (parentId: ParentId, child: Family) => void;
-  depth?: number;
-  hasStem?: boolean;
+  onAddChild: (parentId: ParentId, child: Family) => void;
+  onAddParent: (childId: ParentId, parent: Family) => void;
 }
-// ─── PersonCard (only class added) ───────────────────────
 
-const PersonCard = ({
-  person,
-  onClick,
-  isActive,
-}: {
-  person: PersonNodeType;
-  onClick: () => void;
-  isActive: boolean;
-}) => {
-  const [imgError, setImgError] = useState(false);
-  const isFemale = person.gender === "F";
-  const isDeceased = !person.isAlive || !!person.death;
+const DEFAULT_IMG = "/images/default.jpeg";
 
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`pn-card ${isActive ? "active" : ""}`}
-    >
-      <div className="pn-avatar-wrapper">
-        <div
-          className={`pn-avatar ${
-            isFemale ? "female" : "male"
-          } ${isDeceased ? "deceased" : ""}`}
-        >
-          {!imgError ? (
-            <img
-              src={person.photo}
-              alt={person.name}
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="pn-avatar-fallback" />
-          )}
-        </div>
-
-        {isDeceased && <div className="pn-deceased">✦</div>}
-        <div className="pn-gender">{isFemale ? "♀" : "♂"}</div>
-      </div>
-
-      <span className="pn-name">{person.name}</span>
-      <span className="pn-dob">DOB {person.dob}</span>
-    </button>
-  );
-};
-
-// ─── ActionPopup (only class added) ──────────────────────
-
-const ActionPopup = ({
-  onAction,
-  hasChildren,
-  childrenVisible,
-}: {
-  onAction: (key: ActionKey) => void;
-  hasChildren: boolean;
-  childrenVisible: boolean;
-}) => (
-  <div role="menu" className="pn-popup">
-    <div className="pn-popup-arrow" />
-
-    {ACTIONS.map(({ key, icon, label }) => {
-      if (key === "showKids" && !hasChildren) return null;
-      const isToggled = key === "showKids" && childrenVisible;
-
-      return (
-        <button
-          key={key}
-          role="menuitem"
-          type="button"
-          onClick={() => onAction(key)}
-          className={`pn-action-btn ${isToggled ? "active" : ""}`}
-        >
-          <span className="pn-action-icon">
-            {key === "showKids" && isToggled ? "⌃" : icon}
-          </span>
-
-          {key === "showKids" ? (isToggled ? "Hide Children" : label) : label}
-        </button>
-      );
-    })}
-  </div>
-);
-
-// ─── PersonNode (logic untouched) ────────────────────────
-
-const PersonNode = ({
-  person,
-  onAddPerson,
-  depth = 0,
-  hasStem = false,
-}: PersonNodeProps) => {
+const PersonNode = ({ person, onAddChild, onAddParent }: Props) => {
+  const [showChildren, setShowChildren] = useState(true);
   const [showActions, setShowActions] = useState(false);
-  const [childrenVisible, setChildrenVisible] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isAddChildOpen, setAddChildOpen] = useState(false);
+
+  const [childModal, setChildModal] = useState(false);
+  const [parentModal, setParentModal] = useState(false);
+
   const nodeRef = useRef<HTMLDivElement>(null);
 
+  // close actions on outside click
   useEffect(() => {
     if (!showActions) return;
-    const handle = (e: MouseEvent) => {
+    const handler = (e: MouseEvent) => {
       if (nodeRef.current && !nodeRef.current.contains(e.target as Node)) {
         setShowActions(false);
       }
     };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, [showActions]);
 
-  const handleAction = useCallback((key: ActionKey) => {
-    setShowActions(false);
-    if (key === "viewDetails") setModalOpen(true);
-    if (key === "addChild") setAddChildOpen(true);
-    if (key === "showKids") setChildrenVisible((v) => !v);
-  }, []);
-
-  const handleAddChildSave = useCallback(
+  // add child
+  const handleChildSave = useCallback(
     (child: Family) => {
-      onAddPerson(person.id, child);
-      setChildrenVisible(true);
+      onAddChild(person.id, child);
+      setShowChildren(true);
     },
-    [person.id, onAddPerson],
+    [person.id, onAddChild]
   );
 
-  const spouse = person.spouseData?.[0];
-  const sharedChildren = person.childrenData ?? [];
+  // add parent
+  const handleParentSave = useCallback(
+    (parent: Family) => {
+      onAddParent(person.id, parent);
+    },
+    [person.id, onAddParent]
+  );
+
+  const borderColor =
+    person.gender === "F" ? "#e91e63" : "#2196f3"; // pink / blue
 
   return (
-    <div className="pn-node">
-      {hasStem && <div className="pn-stem" />}
-
-      <div ref={nodeRef} className="pn-couple">
-        <div className="pn-popup-wrapper">
-          {showActions && (
-            <ActionPopup
-              onAction={handleAction}
-              hasChildren={sharedChildren.length > 0}
-              childrenVisible={childrenVisible}
-            />
-          )}
-
-          <PersonCard
-            person={person}
-            onClick={() => setShowActions((v) => !v)}
-            isActive={showActions}
+    <div style={{ textAlign: "center", margin: 20 }}>
+      {/* PERSON CARD */}
+      <div
+        ref={nodeRef}
+        onClick={() => setShowActions((v) => !v)}
+        style={{
+          display: "inline-block",
+          cursor: "pointer",
+          padding: 10,
+          borderRadius: 12,
+          background: "#fff",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          border: `2px solid ${borderColor}`,
+          transition: "0.2s",
+        }}
+      >
+        {/* IMAGE */}
+        <div
+          style={{
+            width: 70,
+            height: 70,
+            borderRadius: "50%",
+            overflow: "hidden",
+            margin: "0 auto",
+            border: `3px solid ${borderColor}`,
+          }}
+        >
+          <img
+            src={person.photo || DEFAULT_IMG}
+            alt={person.name}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
           />
         </div>
 
-        {spouse && (
-          <>
-            <div className="pn-marriage">
-              <div className="line" />
-              <div className="ring">♥</div>
-              <div className="line" />
-            </div>
+        {/* NAME */}
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: 14,
+            fontWeight: 600,
+          }}
+        >
+          {person.name}
+        </div>
 
-            <PersonCard person={spouse} onClick={() => {}} isActive={false} />
-          </>
+        {/* GENDER ICON */}
+        <div style={{ fontSize: 12, color: borderColor }}>
+          {person.gender === "F" ? "♀ Female" : "♂ Male"}
+        </div>
+
+        {/* ACTIONS */}
+        {showActions && (
+          <div
+            style={{
+              marginTop: 10,
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+            }}
+          >
+            <button onClick={() => setParentModal(true)}>⬆ Add Parent</button>
+            <button onClick={() => setChildModal(true)}>⬇ Add Child</button>
+            <button onClick={() => setShowChildren((v) => !v)}>
+              Toggle Children
+            </button>
+          </div>
         )}
       </div>
 
-      {childrenVisible && sharedChildren.length > 0 && (
-        <div className="pn-children">
-          <div className="pn-stem" />
+      {/* CONNECTOR */}
+      {person.childrenData?.length > 0 && (
+        <div
+          style={{
+            width: 2,
+            height: 20,
+            background: "#999",
+            margin: "0 auto",
+          }}
+        />
+      )}
 
-          <div className="pn-children-row">
-            {sharedChildren.map((child) => (
-              <PersonNode
-                key={child.id}
-                person={child}
-                onAddPerson={onAddPerson}
-                depth={depth + 1}
-                hasStem
-              />
-            ))}
-          </div>
+      {/* CHILDREN */}
+      {showChildren && person.childrenData?.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 20,
+            marginTop: 10,
+          }}
+        >
+          {person.childrenData.map((child) => (
+            <PersonNode
+              key={child.id}
+              person={child}
+              onAddChild={onAddChild}
+              onAddParent={onAddParent}
+            />
+          ))}
         </div>
       )}
 
-      <PersonModal
-        person={person}
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
+      {/* MODALS */}
+      <AddChildModal
+        isOpen={childModal}
+        onClose={() => setChildModal(false)}
+        parentId={person.id}
+        onSave={handleChildSave}
       />
 
       <AddChildModal
-        isOpen={isAddChildOpen}
-        onClose={() => setAddChildOpen(false)}
-        parentId={person?.id || null}
-        onSave={handleAddChildSave}
+        isOpen={parentModal}
+        onClose={() => setParentModal(false)}
+        parentId={null}
+        onSave={handleParentSave}
       />
     </div>
   );

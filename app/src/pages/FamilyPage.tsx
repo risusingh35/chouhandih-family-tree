@@ -1,10 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
-import { buildTree } from "../utils/buildTree";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { buildTree, addChildToPersons, addParentToPersons } from "../utils/buildTree";
 import PersonNode from "../components/PersonNode";
-import type { Family } from "../types";
+import type { Family, ParentId } from "../types";
 
 export const FamilyPage = () => {
   const searchParams = useSearchParams();
@@ -13,34 +13,51 @@ export const FamilyPage = () => {
   const [persons, setPersons] = useState<Family[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Add Child
+  const handleAddPerson = useCallback((parentId: ParentId, child: Family) => {
+    setPersons((prev) => addChildToPersons(prev, parentId, child));
+  }, []);
+
+  // ✅ Add Parent
+  const handleAddParent = useCallback((childId: ParentId, parent: Family) => {
+    setPersons((prev) => addParentToPersons(prev, childId, parent));
+  }, []);
+
   // ─── Fetch Data ─────────────────────────────────────
   useEffect(() => {
     if (!vanshId) return;
 
     const fetchFamily = async () => {
-      setLoading(true);
+      try {
+        setLoading(true);
 
-      const res = await fetch(`/api/family?vanshId=${vanshId}`);
-      const json = await res.json();
+        const res = await fetch(`/api/family?vanshId=${vanshId}`);
+        const json = await res.json();
 
-      // 🔥 normalize mongo -> UI format
-      const formatted: Family[] = (json.data || []).map((f: any) => ({
-        id: f._id,
-        name: f.name,
-        gender: f.gender,
-        photo: f.photo,
-        dob: f.dob,
-        death: f.death,
-        isMarried: f.isMarried,
-        isAlive: f.isAlive,
-        isApproved: f.isApproved,
-        spouse: f.spouse || [],
-        parents: f.parents || [],
-        children: f.children || [],
-      }));
+        // ✅ normalize Mongo → UI
+        const formatted: Family[] = (json.data || []).map((f: any) => ({
+          id: f._id?.toString(), // 🔥 IMPORTANT FIX
+          name: f.name,
+          gender: f.gender,
+          photo: f.photo,
+          dob: f.dob,
+          death: f.death,
+          isMarried: f.isMarried,
+          isAlive: f.isAlive,
+          isApproved: f.isApproved,
 
-      setPersons(formatted);
-      setLoading(false);
+          // 🔥 convert ObjectId[] → string[]
+          spouse: (f.spouse || []).map((id: any) => id.toString()),
+          parents: (f.parents || []).map((id: any) => id.toString()),
+          children: (f.children || []).map((id: any) => id.toString()),
+        }));
+
+        setPersons(formatted);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchFamily();
@@ -71,9 +88,8 @@ export const FamilyPage = () => {
       <div style={{ marginTop: 20 }}>
         <PersonNode
           person={tree}
-          onAddPerson={() => {}}
-          depth={0}
-          hasStem={false}
+          onAddChild={handleAddPerson}
+          onAddParent={handleAddParent}
         />
       </div>
     </div>

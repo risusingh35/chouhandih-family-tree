@@ -29,10 +29,7 @@ export interface ChildNode {
     childrenData: ChildNode[];
     spouseData: unknown[];
 }
-export interface PersonNode extends Family {
-    childrenData: PersonNode[];
-    spouseData: PersonNode[];
-}
+
 export interface ChildNode {
     id: string;
     name: string;
@@ -129,6 +126,12 @@ export interface Group {
     description?: string;
     clans: Clan[];
 }
+export interface PersonNode extends Family {
+  childrenData: PersonNode[];
+  spouseData: PersonNode[];
+  parentData?: PersonNode[]; // 👈 ADD THIS
+}
+
 //Types-------------------------------------
 export type ParentId = string | null;
 export type VanshName = "Agnivanshi" | "Chandravanshi" | "Suryavanshi";
