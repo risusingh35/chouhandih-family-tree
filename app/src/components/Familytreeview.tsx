@@ -5,7 +5,7 @@ import PersonNode from "./PersonNode";
 import { buildTree, addChildToPersons } from "../utils/buildTree";
 import AddChildModal from "../modal/AddChildModal";
 import type { ParentId, Person, PersonNode as PersonNodeType } from "../types";
-import { saveFamily } from "../utils/saveFamily";
+import { saveFamily } from "../apiCallHelper/saveFamily";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FamilyTreeViewProps {
@@ -419,24 +419,21 @@ const FamilyTreeView = ({
   // }, [persons]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
-  const handleAddPerson = useCallback(
-    (parentId: ParentId, child: Person) => {
-      setPersons((prev) => addChildToPersons(prev, parentId, child));
-      setToast({
-        msg: `${child.name} added to the family tree`,
-        variant: "success",
-      });
-      saveFamily(addChildToPersons(persons, null, child)).then((ok) => {
-        if (!ok) {
-          setToast({
-            msg: "Failed to save changes to family.json",
-            variant: "error",
-          });
-        }
-      });
-    },
-    [],
-  );
+  const handleAddPerson = useCallback((parentId: ParentId, child: Person) => {
+    setPersons((prev) => addChildToPersons(prev, parentId, child));
+    setToast({
+      msg: `${child.name} added to the family tree`,
+      variant: "success",
+    });
+    saveFamily(addChildToPersons(persons, null, child)).then((ok) => {
+      if (!ok) {
+        setToast({
+          msg: "Failed to save changes to family.json",
+          variant: "error",
+        });
+      }
+    });
+  }, []);
 
   const handleExport = useCallback(() => {
     downloadJSON(persons);

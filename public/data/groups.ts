@@ -23,13 +23,7 @@ export interface Group {
   clans: Clan[];
 }
 
-// ─── Vansh badge colors ───────────────────────────────────────────────────────
 
-export const VANSH_COLOR: Record<Vansh, { bg: string; text: string; border: string }> = {
-  Agnivanshi: { bg: "rgba(200,80,50,0.1)", text: "#9b3a20", border: "rgba(200,80,50,0.3)" },
-  Chandravanshi: { bg: "rgba(60,100,160,0.1)", text: "#1e4a80", border: "rgba(60,100,160,0.3)" },
-  Suryavanshi: { bg: "rgba(190,140,30,0.1)", text: "#7a5a00", border: "rgba(190,140,30,0.3)" },
-};
 
 // ─── Groups ───────────────────────────────────────────────────────────────────
 

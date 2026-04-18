@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 export interface Person {
     id: string;
     name: string;
@@ -71,5 +72,62 @@ export interface AddChildModalProps {
     parentId: ParentId;
     onSave: (child: ChildNode) => void;
 }
+export interface IGroup {
+    _id: string;
+    slug: string;
+    name: string;
+    nameHindi?: string;
+    description?: string;
+    tagline?: string;
+
+    hero?: {
+        title: string;
+        subtitle: string;
+        image: string;
+    };
+
+    history?: string;
+    highlights?: string[];
+
+    quote?: {
+        text: string;
+        author: string;
+    };
+
+    cta?: {
+        label: string;
+        route: string;
+    };
+}
+
+export interface Vansh {
+    name: VanshName;
+    slug: string;
+    color: {
+        bg: string;
+        text: string;
+        border: string;
+    };
+}
+
+export interface Clan {
+    id: string;
+    name: string;
+    altName: string;
+    description: string;
+    origin: string;
+    kuldevi: string;
+    subclans: string[];
+    accent: string;
+    vansh?: Vansh;
+}
+
+export interface Group {
+    id: string;
+    name: string;
+    description?: string;
+    clans: Clan[];
+}
 //Types-------------------------------------
 export type ParentId = string | null;
+export type VanshName = "Agnivanshi" | "Chandravanshi" | "Suryavanshi";

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   GROUPS,
-  VANSH_COLOR,
   type Group,
   type Clan,
 } from "../../../public/data/groups";
@@ -30,58 +29,7 @@ const C = {
   warm300: "rgba(201,169,110,0.40)",
 };
 
-// ─── Ornament SVG ─────────────────────────────────────────────────────────────
-
-const Ornament = ({ width = 120 }: { width?: number }) => (
-  <svg width={width} height={16} viewBox="0 0 120 16" fill="none" aria-hidden>
-    <line
-      x1="0"
-      y1="8"
-      x2="48"
-      y2="8"
-      stroke={C.gold}
-      strokeWidth="0.8"
-      opacity="0.6"
-    />
-    <circle
-      cx="52"
-      cy="8"
-      r="2.5"
-      fill="none"
-      stroke={C.gold}
-      strokeWidth="0.8"
-      opacity="0.7"
-    />
-    <circle
-      cx="60"
-      cy="8"
-      r="4"
-      fill="none"
-      stroke={C.gold}
-      strokeWidth="1"
-      opacity="0.9"
-    />
-    <circle
-      cx="68"
-      cy="8"
-      r="2.5"
-      fill="none"
-      stroke={C.gold}
-      strokeWidth="0.8"
-      opacity="0.7"
-    />
-    <line
-      x1="72"
-      y1="8"
-      x2="120"
-      y2="8"
-      stroke={C.gold}
-      strokeWidth="0.8"
-      opacity="0.6"
-    />
-  </svg>
-);
-
+// ─── Ornament SVG ───────────────────────────────────────────────────────
 // ─── Vansh Badge ─────────────────────────────────────────────────────────────
 
 const VanshBadge = ({ vansh }: { vansh: Clan["vansh"] }) => {
@@ -376,132 +324,6 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
             zIndex: 0,
           }}
         />
-
-        {/* ── Hero Banner ──────────────────────────────────────────────────── */}
-        <header
-          style={{
-            position: "relative",
-            zIndex: 1,
-            textAlign: "center",
-            padding: "56px 24px 48px",
-            animation: "gs-banner-in 0.5s ease forwards",
-          }}
-        >
-          {/* Decorative top border */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 5,
-              background: `linear-gradient(90deg, transparent, ${C.gold}, #c9a96e, ${C.gold}, transparent)`,
-            }}
-          />
-
-          <p
-            style={{
-              margin: "0 0 10px",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: C.gold,
-            }}
-          >
-            ✦ Vansh Vriksha ✦
-          </p>
-
-          <h1
-            style={{
-              margin: "0 0 6px",
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "clamp(32px, 6vw, 52px)",
-              fontWeight: 600,
-              color: C.bark,
-              lineHeight: 1.15,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {activeGroup.name}
-            <span
-              style={{
-                display: "block",
-                fontStyle: "italic",
-                fontWeight: 400,
-                fontSize: "0.55em",
-                color: C.gold,
-                letterSpacing: "0.05em",
-              }}
-            >
-              {activeGroup.nameHindi}
-            </span>
-          </h1>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              margin: "16px 0",
-            }}
-          >
-            <Ornament width={160} />
-          </div>
-
-          <p
-            style={{
-              margin: "0 auto",
-              maxWidth: 520,
-              fontSize: 14,
-              color: C.muted,
-              lineHeight: 1.7,
-            }}
-          >
-            {activeGroup.description}
-          </p>
-
-          {/* Group tabs (for future groups) */}
-          {GROUPS.length > 1 && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: 8,
-                marginTop: 24,
-              }}
-            >
-              {GROUPS.map((g) => (
-                <button
-                  key={g.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveGroup(g);
-                    setVanshFilter("All");
-                    setSearch("");
-                  }}
-                  className="gs-tab"
-                  style={{
-                    padding: "8px 18px",
-                    borderRadius: 10,
-                    border: `1.5px solid ${activeGroup.id === g.id ? C.gold : C.sand}`,
-                    background:
-                      activeGroup.id === g.id ? C.warm200 : "transparent",
-                    color: activeGroup.id === g.id ? C.umber : C.muted,
-                    cursor: "pointer",
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    transition: "all 0.16s",
-                  }}
-                >
-                  {g.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </header>
-
         {/* ── Filters ──────────────────────────────────────────────────────── */}
         <div
           style={{
@@ -685,30 +507,6 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
             </div>
           )}
         </main>
-
-        {/* Footer */}
-        <footer
-          style={{
-            textAlign: "center",
-            padding: "20px 24px",
-            borderTop: `1px solid ${C.sand}`,
-            fontSize: 11,
-            color: C.muted,
-            fontFamily: "'DM Sans', sans-serif",
-            letterSpacing: "0.04em",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: 8,
-            }}
-          >
-            <Ornament width={80} />
-          </div>
-          वंश वृक्ष — Preserving Heritage, One Family at a Time
-        </footer>
       </div>
     </>
   );
