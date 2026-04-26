@@ -1,5 +1,6 @@
 // utils/buildTree.ts
 
+import { saveFamily } from "../apiCallHelper/saveFamily";
 import type { ParentId, Family, PersonNode } from "../types";
 
 /**
@@ -10,59 +11,42 @@ export function buildTree(persons: Family[]): PersonNode | null {
 
   const map: Record<string, PersonNode> = {};
 
-  // ─── Init ───────────────────────────────────────────
-  for (const p of persons) {
-    if (!p.id) continue;
-
+  // ─── Init ─────────────────────────────
+  persons.forEach((p) => {
     map[p.id] = {
       ...p,
       childrenData: [],
       spouseData: [],
       parentData: [],
     };
-  }
+  });
 
-  // ─── Link Relations ─────────────────────────────────
-  for (const p of persons) {
-    if (!p.id || !map[p.id]) continue;
-
+  // ─── Build Parent + Children (from parents only) ───
+  persons.forEach((p) => {
     const node = map[p.id];
 
-    // children
-    if (Array.isArray(p.children)) {
-      node.childrenData = p.children
-        .map((id) => map[id])
-        .filter(Boolean);
-    }
-
-    // spouse
-    if (Array.isArray(p.spouse)) {
-      node.spouseData = p.spouse
-        .map((id) => map[id])
-        .filter(Boolean);
-    }
-
     // parents
-    if (Array.isArray(p.parents)) {
-      node.parentData = p.parents
-        .map((id) => map[id])
-        .filter(Boolean);
-    }
-  }
+    node.parentData =
+      p.parents?.map((id) => map[id]).filter(Boolean) || [];
 
-  // ─── ROOT DETECTION (IMPROVED) ──────────────────────
-  const roots = persons.filter(
-    (p) => !p.parents || p.parents.length === 0
-  );
+    // 🔥 derive children (IMPORTANT)
+    p.parents?.forEach((parentId) => {
+      if (map[parentId]) {
+        map[parentId].childrenData.push(node);
+      }
+    });
+  });
 
-  if (!roots.length) {
-    // fallback → pick any node
-    return map[persons[0].id];
-  }
+  // ─── Spouse Linking (bi-directional safe) ──────────
+  persons.forEach((p) => {
+    const node = map[p.id];
 
-  // prefer oldest ancestor (no parent AND has children)
-  // find TOP MOST ancestor (no parents)
-  const root = persons.find((p) => !p.parents || p.parents.length === 0);
+    node.spouseData =
+      p.spouse?.map((id) => map[id]).filter(Boolean) || [];
+  });
+
+  // ─── Root Detection ───────────────────────────────
+  const root = persons.find((p) => !p.parents?.length);
 
   return root ? map[root.id] : null;
 }
@@ -86,12 +70,15 @@ export function upsertPerson(persons: Family[], incoming: Family): Family[] {
 /**
  * Add Child
  */
-export function addChildToPersons(
+export async function addChildToPersons(
   persons: Family[],
   parentId: ParentId,
   child: Family
-): Family[] {
+): Promise<Family[]> {
+
   if (!parentId || !child?.id) return persons;
+  // save data in db
+  await saveFamily(child)
 
   const withChild = upsertPerson(persons, child);
 

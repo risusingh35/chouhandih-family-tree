@@ -51,9 +51,6 @@ export async function GET(request: NextRequest) {
       limit,
       skip,
     });
-
-    console.log("items--------------", items);
-
     return NextResponse.json<ApiResponse<typeof items>>(
       { success: true, data: items },
       { status: 200 }

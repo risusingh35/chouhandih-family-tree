@@ -20,6 +20,7 @@ const INITIAL_FORM: FormData = {
   isMarried: false,
   spouse: [],
   isAlive: true,
+  vanshId: "",
 };
 
 const TODAY = new Date().toISOString().split("T")[0];
@@ -66,6 +67,7 @@ const AddChildModal = ({
   onClose,
   parentId,
   onSave,
+  vanshId,
 }: AddChildModalProps) => {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -154,6 +156,7 @@ const AddChildModal = ({
       isApproved: false,
       childrenData: [],
       spouseData: [],
+      vanshId,
     };
 
     onSave(newChild);
@@ -311,7 +314,7 @@ const AddChildModal = ({
               />
             </Field>
           )}
-          {/* /* Married toggle */ }
+          {/* /* Married toggle */}
           <Field label="Marital Status">
             <button
               type="button"

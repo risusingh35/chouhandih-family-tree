@@ -28,6 +28,7 @@ export interface ChildNode {
     children: string[];
     childrenData: ChildNode[];
     spouseData: unknown[];
+    vanshId: string;
 }
 
 export interface ChildNode {
@@ -55,6 +56,7 @@ export interface FormData {
     isMarried: boolean;
     spouse: string[];
     isAlive: boolean;
+    vanshId: string;
 }
 
 export interface FormErrors {
@@ -68,6 +70,7 @@ export interface AddChildModalProps {
     onClose: () => void;
     parentId: ParentId;
     onSave: (child: ChildNode) => void;
+    vanshId:string
 }
 export interface IGroup {
     _id: string;
@@ -127,9 +130,9 @@ export interface Group {
     clans: Clan[];
 }
 export interface PersonNode extends Family {
-  childrenData: PersonNode[];
-  spouseData: PersonNode[];
-  parentData?: PersonNode[]; // 👈 ADD THIS
+    childrenData: PersonNode[];
+    spouseData: PersonNode[];
+    parentData?: PersonNode[]; // 👈 ADD THIS
 }
 
 //Types-------------------------------------

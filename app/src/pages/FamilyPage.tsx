@@ -2,21 +2,27 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { buildTree, addChildToPersons, addParentToPersons } from "../utils/buildTree";
+import {
+  buildTree,
+  addChildToPersons,
+  addParentToPersons,
+} from "../utils/buildTree";
 import PersonNode from "../components/PersonNode";
 import type { Family, ParentId } from "../types";
 
 export const FamilyPage = () => {
   const searchParams = useSearchParams();
-  const vanshId = searchParams.get("vanshId");
+  const vanshId = searchParams.get("vanshId") || "";
 
   const [persons, setPersons] = useState<Family[]>([]);
   const [loading, setLoading] = useState(true);
 
   // ✅ Add Child
-  const handleAddPerson = useCallback((parentId: ParentId, child: Family) => {
-    setPersons((prev) => addChildToPersons(prev, parentId, child));
-  }, []);
+  const handleAddPerson = (parentId: ParentId, child: Family) => {
+    addChildToPersons(persons, parentId, child);
+
+    // setPersons((prev) => );
+  };
 
   // ✅ Add Parent
   const handleAddParent = useCallback((childId: ParentId, parent: Family) => {
@@ -25,14 +31,13 @@ export const FamilyPage = () => {
 
   // ─── Fetch Data ─────────────────────────────────────
   useEffect(() => {
-    if (!vanshId) return;
-
     const fetchFamily = async () => {
       try {
         setLoading(true);
 
         const res = await fetch(`/api/family?vanshId=${vanshId}`);
         const json = await res.json();
+        console.log("json-------------", json);
 
         // ✅ normalize Mongo → UI
         const formatted: Family[] = (json.data || []).map((f: any) => ({
@@ -61,7 +66,7 @@ export const FamilyPage = () => {
     };
 
     fetchFamily();
-  }, [vanshId]);
+  }, []);
 
   // ─── Build Tree ─────────────────────────────────────
   const tree = useMemo(() => buildTree(persons), [persons]);
@@ -90,6 +95,7 @@ export const FamilyPage = () => {
           person={tree}
           onAddChild={handleAddPerson}
           onAddParent={handleAddParent}
+          vanshId={vanshId}
         />
       </div>
     </div>

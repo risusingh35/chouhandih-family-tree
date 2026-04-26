@@ -8,11 +8,12 @@ interface Props {
   person: PersonNodeType;
   onAddChild: (parentId: ParentId, child: Family) => void;
   onAddParent: (childId: ParentId, parent: Family) => void;
+  vanshId: string;
 }
 
 const DEFAULT_IMG = "/images/default.jpeg";
 
-const PersonNode = ({ person, onAddChild, onAddParent }: Props) => {
+const PersonNode = ({ person, onAddChild, onAddParent, vanshId }: Props) => {
   const [showChildren, setShowChildren] = useState(true);
   const [showActions, setShowActions] = useState(false);
 
@@ -34,24 +35,20 @@ const PersonNode = ({ person, onAddChild, onAddParent }: Props) => {
   }, [showActions]);
 
   // add child
-  const handleChildSave = useCallback(
-    (child: Family) => {
-      onAddChild(person.id, child);
-      setShowChildren(true);
-    },
-    [person.id, onAddChild]
-  );
+  const handleChildSave = (child: Family) => {
+    onAddChild(person.id, child);
+    setShowChildren(true);
+  };
 
   // add parent
   const handleParentSave = useCallback(
     (parent: Family) => {
       onAddParent(person.id, parent);
     },
-    [person.id, onAddParent]
+    [person.id, onAddParent],
   );
 
-  const borderColor =
-    person.gender === "F" ? "#e91e63" : "#2196f3"; // pink / blue
+  const borderColor = person.gender === "F" ? "#e91e63" : "#2196f3"; // pink / blue
 
   return (
     <div style={{ textAlign: "center", margin: 20 }}>
@@ -118,7 +115,9 @@ const PersonNode = ({ person, onAddChild, onAddParent }: Props) => {
               gap: 6,
             }}
           >
-            <button onClick={() => setParentModal(true)}>⬆ Add Parent</button>
+            {(person?.parents?.length || 0) > 0 && (
+              <button onClick={() => setParentModal(true)}>⬆ Add Parent</button>
+            )}
             <button onClick={() => setChildModal(true)}>⬇ Add Child</button>
             <button onClick={() => setShowChildren((v) => !v)}>
               Toggle Children
@@ -155,6 +154,7 @@ const PersonNode = ({ person, onAddChild, onAddParent }: Props) => {
               person={child}
               onAddChild={onAddChild}
               onAddParent={onAddParent}
+              vanshId={vanshId}
             />
           ))}
         </div>
@@ -166,6 +166,7 @@ const PersonNode = ({ person, onAddChild, onAddParent }: Props) => {
         onClose={() => setChildModal(false)}
         parentId={person.id}
         onSave={handleChildSave}
+        vanshId={vanshId}
       />
 
       <AddChildModal
@@ -173,6 +174,7 @@ const PersonNode = ({ person, onAddChild, onAddParent }: Props) => {
         onClose={() => setParentModal(false)}
         parentId={null}
         onSave={handleParentSave}
+        vanshId={vanshId}
       />
     </div>
   );

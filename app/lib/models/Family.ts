@@ -90,7 +90,7 @@ const FamilySchema: Schema<IFamily> = new Schema(
     vanshId: {
       type: Schema.Types.ObjectId,
       ref: "Vansh",
-      required: false, 
+      required: true, 
       default: null,
       index: true,
     },
