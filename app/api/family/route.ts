@@ -8,6 +8,7 @@ import { Types } from "mongoose";
 
 // ── GET /api/items ─────────────────────────────────────────────
 export async function GET(request: NextRequest) {
+  let message = ""
   try {
     const { searchParams } = new URL(request.url);
 
@@ -18,33 +19,24 @@ export async function GET(request: NextRequest) {
     const skip = Number(searchParams.get("skip")) || 0;
 
     const filter: Record<string, any> = {};
-
-    // ✅ Vansh Logic (FIXED)
-    if (vanshIdParam) {
-      filter.$or = [
-        { vanshId: new Types.ObjectId(vanshIdParam) },
-        { vanshId: null },
-        { vanshId: { $exists: false } }, // safety
-      ];
-    } else {
-      filter.$or = [
-        { vanshId: null },
-        { vanshId: { $exists: false } },
-      ];
+    // console.log("vanshIdParam------------", vanshIdParam);
+    if (!vanshIdParam) {
+      message = "Vansh Id is required"
+      console.error("GET /api/family:", message);
+      return NextResponse.json<ApiResponse<never>>(
+        { success: false, error: message },
+        { status: 500 }
+      );
     }
+    filter.$or = [
+      { vanshId: new Types.ObjectId(vanshIdParam) },
+      { vanshId: null },
+    ]
 
     // ✅ Approved Filter (FIXED FIELD)
     if (isApprovedParam !== null) {
       filter.isApproved = isApprovedParam === "true";
     }
-
-    //     console.log("filter------------", filter);
-    //     const data=db.families.find(
-    //   { _id: ObjectId("69e37d8d2503bbdc6a178115") },
-    //   { vanshId: 1 }
-    // )
-    //     console.log("DB COUNT:", await Family.countDocuments());
-    //     console.log("NULL COUNT:", await Family.countDocuments({ vanshId: null }));
     // ✅ APPLY FILTER (MAIN FIX)
     const items = await getDocs(Family, filter, {
       sort: { createdAt: -1 },
@@ -56,7 +48,7 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    const message =
+    message =
       error instanceof Error ? error.message : "Unknown error";
 
     console.error("GET /api/family:", message);
