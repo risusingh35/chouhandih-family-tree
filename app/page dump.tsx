@@ -56,12 +56,10 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!selection) return;
-    console.log("selection-----------------------", selection);
     const selectedPersons = (personsData as any)[selection.groupId][
       selection.clanId
     ];
     setSelectedFamilyGroup(selectedPersons || []);
-    console.log("selectedPersons-----------------------", selectedPersons);
   }, [selection]);
 
   if (!selection) {
@@ -74,7 +72,6 @@ export default function HomePage() {
 
   return (
     <>
-      {console.log("selection-----------------------", selection)}
       <FamilyTreeView
         initialPersons={selectedFamilyGroup as Family[]}
         groupSelection={selection}

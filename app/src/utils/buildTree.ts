@@ -78,8 +78,6 @@ export async function addChildToPersons(
 
   if (!parentId || !child?.id) return persons;
   // save data in db
-  console.log("addChildToPersons------------clicked");
-  
   await saveFamily(child)
 
   const withChild = upsertPerson(persons, child);

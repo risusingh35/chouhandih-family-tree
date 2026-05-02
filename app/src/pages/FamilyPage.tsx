@@ -18,14 +18,13 @@ export const FamilyPage = () => {
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
 
-  // 🔥 GLOBAL ACTIVE NODE (fix double click issue)
-  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   // ✅ Add Child
   const handleAddPerson = (parentId: ParentId, child: Family) => {
-    addChildToPersons(persons, parentId, child);
-    setReload((prev) => !prev); // trigger reload to fetch latest data from db
-
-    // setPersons((prev) => );
+    const addChild = async () => {
+      await addChildToPersons(persons, parentId, child);
+      setReload((prev) => !prev); // trigger reload to fetch latest data from db
+    };
+    addChild();
   };
   // ✅ Add Parent
   const handleAddParent = useCallback((childId: ParentId, parent: Family) => {
@@ -37,10 +36,8 @@ export const FamilyPage = () => {
     const fetchFamily = async () => {
       try {
         setLoading(true);
-
         const res = await fetch(`/api/family?vanshId=${vanshId}`);
         const json = await res.json();
-
         const formatted: Family[] = (json.data || []).map((f: any) => ({
           id: f._id?.toString(),
           name: f.name,

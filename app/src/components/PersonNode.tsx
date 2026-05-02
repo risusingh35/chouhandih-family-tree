@@ -49,8 +49,6 @@ const PersonNode = ({
   }, [person.spouse, persons]);
 
   const handleChildSave = (child: Family) => {
-    console.log("handleChildSave called");
-
     onAddChild(person.id, child);
     setShowChildren(true);
   };

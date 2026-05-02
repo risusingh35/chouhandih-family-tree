@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
     const skip = Number(searchParams.get("skip")) || 0;
 
     const filter: Record<string, any> = {};
-    // console.log("vanshIdParam------------", vanshIdParam);
     if (!vanshIdParam) {
       message = "Vansh Id is required"
       console.error("GET /api/family:", message);

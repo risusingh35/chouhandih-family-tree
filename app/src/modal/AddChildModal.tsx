@@ -182,8 +182,6 @@ const filteredSpouse = useMemo(() => {
     if (Object.keys(errs).length) return;
 
     const spouseIds = selectedSpouse ? [selectedSpouse.id] : [];
-    console.log("spouseIds-------------", spouseIds);
-
     const newChild: ChildNode = {
       id: uuidv4(),
       ...form,
@@ -195,8 +193,6 @@ const filteredSpouse = useMemo(() => {
       spouseData: [],
       vanshId,
     };
-    console.log("newChild------------", newChild);
-
     onSave(newChild);
     onClose();
   };

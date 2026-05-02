@@ -239,15 +239,15 @@ const ToolbarButton = ({
       }}
       onMouseEnter={(e) => {
         if (!disabled)
-          ((e.currentTarget.style.opacity =
+          (e.currentTarget.style.opacity =
             variant === "primary" ? "0.85" : "1"),
             (e.currentTarget.style.background =
-              variant !== "primary" ? C.warm100 : s.bg));
+              variant !== "primary" ? C.warm100 : s.bg);
       }}
       onMouseLeave={(e) => {
         if (!disabled)
-          ((e.currentTarget.style.opacity = "1"),
-            (e.currentTarget.style.background = s.bg));
+          (e.currentTarget.style.opacity = "1"),
+            (e.currentTarget.style.background = s.bg);
       }}
     >
       <span aria-hidden>{icon}</span>
@@ -458,8 +458,6 @@ const FamilyTreeView = ({
   };
 
   const handleAddChildSave = useCallback((child: Family) => {
-    console.log("child-----------------", child);
-
     setModalOpen(false);
     setAddChildOpen(false);
     saveFamily(addChildToPersons(persons, null, child)).then((ok) => {
