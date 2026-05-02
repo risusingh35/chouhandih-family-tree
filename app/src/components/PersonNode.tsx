@@ -10,40 +10,16 @@ interface Props {
   onAddParent: (childId: ParentId, parent: Family) => void;
   vanshId: string;
   persons: Family[];
-
-  activeNodeId: string | null;
-  setActiveNodeId: (id: string | null) => void;
 }
 
 const PersonNode = ({
   person,
+  persons,
   onAddChild,
   onAddParent,
   vanshId,
-  persons,
-  activeNodeId,
-  setActiveNodeId,
 }: Props) => {
   const nodeRef = useRef<HTMLDivElement>(null);
-
-  const isActive = activeNodeId === person.id;
-
-  // ✅ outside click close
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (!nodeRef.current?.contains(e.target as Node)) {
-        setActiveNodeId(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [setActiveNodeId]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setActiveNodeId(isActive ? null : person.id);
-  };
 
   // ✅ GROUP CHILDREN AS COUPLE
   const groupedChildren = useMemo(() => {
@@ -81,14 +57,16 @@ const PersonNode = ({
         <Card
           person={person}
           persons={persons}
-          isActive={isActive}
-          onClick={handleClick}
+          onAddChild={onAddChild}
+          onAddParent={onAddParent}
         />
       </div>
 
       {/* CONNECTOR */}
       {person.childrenData?.length > 0 && (
-        <div style={{ height: 30, borderLeft: "2px solid #ccc", margin: "auto" }} />
+        <div
+          style={{ height: 30, borderLeft: "2px solid #ccc", margin: "auto" }}
+        />
       )}
 
       {/* CHILDREN */}
@@ -99,14 +77,11 @@ const PersonNode = ({
               <div key={i} style={{ display: "flex", gap: 10 }}>
                 {group.members.map((m: any) => (
                   <PersonNode
-                    key={m.id}
                     person={m}
                     persons={persons}
                     vanshId={vanshId}
                     onAddChild={onAddChild}
                     onAddParent={onAddParent}
-                    activeNodeId={activeNodeId}
-                    setActiveNodeId={setActiveNodeId}
                   />
                 ))}
               </div>
@@ -115,14 +90,11 @@ const PersonNode = ({
 
           return (
             <PersonNode
-              key={group.members[0].id}
               person={group.members[0]}
               persons={persons}
               vanshId={vanshId}
               onAddChild={onAddChild}
               onAddParent={onAddParent}
-              activeNodeId={activeNodeId}
-              setActiveNodeId={setActiveNodeId}
             />
           );
         })}

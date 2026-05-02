@@ -18,9 +18,6 @@ export const FamilyPage = () => {
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(true);
 
-  // ✅ GLOBAL ACTIVE NODE
-  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
-
   const handleAddPerson = (parentId: ParentId, child: Family) => {
     const addChild = async () => {
       await addChildToPersons(persons, parentId, child);
@@ -72,8 +69,6 @@ export const FamilyPage = () => {
         vanshId={vanshId}
         onAddChild={handleAddPerson}
         onAddParent={() => {}}
-        activeNodeId={activeNodeId}
-        setActiveNodeId={setActiveNodeId}
       />
     </div>
   );
