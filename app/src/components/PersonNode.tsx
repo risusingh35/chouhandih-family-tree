@@ -3,7 +3,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import AddChildModal from "../modal/AddChildModal";
 import type { PersonNode as PersonNodeType, Family, ParentId } from "../types";
-
 interface Props {
   person: PersonNodeType;
   onAddChild: (parentId: ParentId, child: Family) => void;
@@ -56,11 +55,11 @@ const PersonNode = ({
   const handleParentSave = useCallback(
     (parent: Family) => {
       alert("Clicked handleParentSave:" + person.id);
-      onAddParent(person.id, parent);
+      // onAddParent(person.id, parent);ß
     },
     [person.id, onAddParent],
   );
-
+  console.log("person-----------------------", person);
   const borderColor = person.gender === "F" ? "#e91e63" : "#2196f3";
 
   // ───────────────── UI ─────────────────
