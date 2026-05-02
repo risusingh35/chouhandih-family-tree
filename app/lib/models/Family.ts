@@ -5,7 +5,8 @@ export interface IFamily extends Document {
   gender: "M" | "F";
   photo: string;
   dob: Date;
-  death: Date | null;
+  dom: Date | null;
+  dod: Date | null;
   isMarried: boolean;
   isAlive: boolean;
   isApproved: boolean;
@@ -44,7 +45,11 @@ const FamilySchema: Schema<IFamily> = new Schema(
       required: true,
     },
 
-    death: {
+    dom: {
+      type: Date,
+      default: null,
+    },
+    dod: {
       type: Date,
       default: null,
     },

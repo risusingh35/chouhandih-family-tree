@@ -3,7 +3,7 @@
     "jadon": [
       {
         "id": "1",
-        "death": "05-08-2020",
+        "dod": "05-08-2020",
         "dob": "01-01-1980",
         "name": "Ramesh",
         "gender": "M",
@@ -15,7 +15,7 @@
       },
       {
         "id": "2",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Sita",
         "gender": "F",
@@ -27,7 +27,7 @@
       },
       {
         "id": "3",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Mahesh",
         "gender": "M",
@@ -39,7 +39,7 @@
       },
       {
         "id": "4",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Geeta",
         "gender": "F",
@@ -51,7 +51,7 @@
       },
       {
         "id": "5",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Kavita",
         "gender": "F",
@@ -63,7 +63,7 @@
       },
       {
         "id": "6",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Raj",
         "gender": "M",
@@ -75,7 +75,7 @@
       },
       {
         "id": "7",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Amit",
         "gender": "M",
@@ -87,7 +87,7 @@
       },
       {
         "id": "8",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Neha",
         "gender": "F",
@@ -99,7 +99,7 @@
       },
       {
         "id": "9",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Rohit",
         "gender": "M",
@@ -111,7 +111,7 @@
       },
       {
         "id": "10",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Pooja",
         "gender": "F",
@@ -123,7 +123,7 @@
       },
       {
         "id": "11",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Riya",
         "gender": "F",
@@ -135,7 +135,7 @@
       },
       {
         "id": "12",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Simran",
         "gender": "F",
@@ -147,7 +147,7 @@
       },
       {
         "id": "13",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Karan",
         "gender": "M",
@@ -159,7 +159,7 @@
       },
       {
         "id": "14",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Anjali",
         "gender": "F",
@@ -171,7 +171,7 @@
       },
       {
         "id": "15",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Vikas",
         "gender": "M",
@@ -183,7 +183,7 @@
       },
       {
         "id": "16",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Meena",
         "gender": "F",
@@ -195,7 +195,7 @@
       },
       {
         "id": "17",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Arjun",
         "gender": "M",
@@ -207,7 +207,7 @@
       },
       {
         "id": "18",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Sneha",
         "gender": "F",
@@ -219,7 +219,7 @@
       },
       {
         "id": "19",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Suresh",
         "gender": "M",
@@ -231,7 +231,7 @@
       },
       {
         "id": "20",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Lata",
         "gender": "F",
@@ -243,7 +243,7 @@
       },
       {
         "id": "21",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Deepak",
         "gender": "M",
@@ -255,7 +255,7 @@
       },
       {
         "id": "22",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Sunita",
         "gender": "F",
@@ -267,7 +267,7 @@
       },
       {
         "id": "23",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Manoj",
         "gender": "M",
@@ -279,7 +279,7 @@
       },
       {
         "id": "24",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Rekha",
         "gender": "F",
@@ -291,7 +291,7 @@
       },
       {
         "id": "25",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Ajay",
         "gender": "M",
@@ -303,7 +303,7 @@
       },
       {
         "id": "26",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Tina",
         "gender": "F",
@@ -315,7 +315,7 @@
       },
       {
         "id": "27",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Old1",
         "gender": "M",
@@ -327,7 +327,7 @@
       },
       {
         "id": "28",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Old2",
         "gender": "F",
@@ -339,7 +339,7 @@
       },
       {
         "id": "29",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person29",
         "gender": "M",
@@ -351,7 +351,7 @@
       },
       {
         "id": "30",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person30",
         "gender": "F",
@@ -363,7 +363,7 @@
       },
       {
         "id": "31",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person31",
         "gender": "M",
@@ -375,7 +375,7 @@
       },
       {
         "id": "32",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person32",
         "gender": "F",
@@ -387,7 +387,7 @@
       },
       {
         "id": "33",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person33",
         "gender": "M",
@@ -399,7 +399,7 @@
       },
       {
         "id": "34",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person34",
         "gender": "F",
@@ -411,7 +411,7 @@
       },
       {
         "id": "35",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person35",
         "gender": "M",
@@ -423,7 +423,7 @@
       },
       {
         "id": "36",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person36",
         "gender": "F",
@@ -435,7 +435,7 @@
       },
       {
         "id": "37",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person37",
         "gender": "M",
@@ -447,7 +447,7 @@
       },
       {
         "id": "38",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person38",
         "gender": "F",
@@ -459,7 +459,7 @@
       },
       {
         "id": "39",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person39",
         "gender": "M",
@@ -471,7 +471,7 @@
       },
       {
         "id": "40",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person40",
         "gender": "F",
@@ -483,7 +483,7 @@
       },
       {
         "id": "41",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person41",
         "gender": "M",
@@ -495,7 +495,7 @@
       },
       {
         "id": "42",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person42",
         "gender": "F",
@@ -507,7 +507,7 @@
       },
       {
         "id": "43",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person43",
         "gender": "M",
@@ -519,7 +519,7 @@
       },
       {
         "id": "44",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person44",
         "gender": "F",
@@ -531,7 +531,7 @@
       },
       {
         "id": "45",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person45",
         "gender": "M",
@@ -543,7 +543,7 @@
       },
       {
         "id": "46",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person46",
         "gender": "F",
@@ -555,7 +555,7 @@
       },
       {
         "id": "47",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person47",
         "gender": "M",
@@ -567,7 +567,7 @@
       },
       {
         "id": "48",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person48",
         "gender": "F",
@@ -579,7 +579,7 @@
       },
       {
         "id": "49",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person49",
         "gender": "M",
@@ -591,7 +591,7 @@
       },
       {
         "id": "50",
-        "death": null,
+        "dod": null,
         "dob": "01-01-1980",
         "name": "Person50",
         "gender": "F",
@@ -607,7 +607,7 @@
         "gender": "M",
         "photo": "/images/default.jpeg",
         "dob": "2026-04-02",
-        "death": "",
+        "dod": "",
         "isMarried": false,
         "spouse": [],
         "isAlive": true,
@@ -622,7 +622,7 @@
         "gender": "M",
         "photo": "/images/default.jpeg",
         "dob": "2026-04-01",
-        "death": "",
+        "dod": "",
         "isMarried": false,
         "spouse": [],
         "isAlive": true,

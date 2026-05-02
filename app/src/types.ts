@@ -5,7 +5,7 @@ export interface Family {
     gender: "M" | "F";
     photo: string;
     dob: string;
-    death: string | null;
+    dod: string | null;
     isMarried: boolean;
     isAlive: boolean;
     isApproved: boolean;
@@ -19,7 +19,7 @@ export interface ChildNode {
     gender: "M" | "F";
     photo: string;
     dob: string;
-    death: string;
+    dod: string;
     isMarried: boolean;
     spouse: string[] | null;
     isAlive: boolean;
@@ -36,7 +36,8 @@ export interface FormData {
     gender: "M" | "F";
     photo: string;
     dob: string;
-    death: string;
+    dom: string;
+    dod: string;
     isMarried: boolean;
     spouse: string[] | null;
     isAlive: boolean;
@@ -46,7 +47,7 @@ export interface FormData {
 export interface FormErrors {
     name?: string;
     dob?: string;
-    death?: string;
+    dod?: string;
 }
 
 export interface AddChildModalProps {

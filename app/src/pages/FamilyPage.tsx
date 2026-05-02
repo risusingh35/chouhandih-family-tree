@@ -39,7 +39,7 @@ export const FamilyPage = () => {
         gender: f.gender,
         photo: f.photo,
         dob: f.dob,
-        death: f.death,
+        dod: f.dod,
         isMarried: f.isMarried,
         isAlive: f.isAlive,
         spouse: Array.isArray(f.spouse) ? f.spouse : [],
