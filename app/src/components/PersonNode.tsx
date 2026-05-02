@@ -43,11 +43,14 @@ const PersonNode = ({
 
   // ─── spouse resolve ─────────────────
   const spouse = useMemo(() => {
-    if (!person.spouse?.length) return null;
-    return persons.find((p) => p.id === person.spouse[0]) || null;
+    const spouseIds = person.spouse ?? [];
+    if (!spouseIds.length) return null;
+    return persons.find((p) => p.id === spouseIds[0]) || null;
   }, [person.spouse, persons]);
 
   const handleChildSave = (child: Family) => {
+    console.log("handleChildSave called");
+
     onAddChild(person.id, child);
     setShowChildren(true);
   };

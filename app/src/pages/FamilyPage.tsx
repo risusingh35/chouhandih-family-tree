@@ -16,24 +16,20 @@ export const FamilyPage = () => {
 
   const [persons, setPersons] = useState<Family[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(false);
 
   // 🔥 GLOBAL ACTIVE NODE (fix double click issue)
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  // ✅ Add Child
+  const handleAddPerson = (parentId: ParentId, child: Family) => {
+    addChildToPersons(persons, parentId, child);
+    setReload((prev) => !prev); // trigger reload to fetch latest data from db
 
-  // ✅ Add Child (FIX: must trigger re-render)
-  const handleAddPerson = useCallback((parentId: ParentId, child: Family) => {
-    setPersons((prev) => {
-      const cloned = structuredClone(prev); // 🔥 avoid mutation bugs
-      return addChildToPersons(cloned, parentId, child);
-    });
-  }, []);
-
+    // setPersons((prev) => );
+  };
   // ✅ Add Parent
   const handleAddParent = useCallback((childId: ParentId, parent: Family) => {
-    setPersons((prev) => {
-      const cloned = structuredClone(prev); // 🔥 avoid mutation bugs
-      return addParentToPersons(cloned, childId, parent);
-    });
+    setPersons((prev) => addParentToPersons([...prev], childId, parent));
   }, []);
 
   // ─── Fetch Data ─────────────────────────────────────
@@ -78,7 +74,7 @@ export const FamilyPage = () => {
     };
 
     fetchFamily();
-  }, [vanshId]);
+  }, [vanshId, reload]);
 
   // ─── Build Tree ─────────────────────────────────────
   const tree = useMemo(() => buildTree(persons), [persons]);
@@ -117,8 +113,6 @@ export const FamilyPage = () => {
           onAddParent={handleAddParent}
           vanshId={vanshId}
           persons={persons}
-          activeNodeId={activeNodeId}
-          setActiveNodeId={setActiveNodeId}
         />
       </div>
     </div>
