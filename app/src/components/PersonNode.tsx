@@ -9,11 +9,18 @@ interface Props {
   onAddChild: (parentId: ParentId, child: Family) => void;
   onAddParent: (childId: ParentId, parent: Family) => void;
   vanshId: string;
+  persons: Family[];
 }
 
 const DEFAULT_IMG = "/images/default.jpeg";
 
-const PersonNode = ({ person, onAddChild, onAddParent, vanshId }: Props) => {
+const PersonNode = ({
+  person,
+  onAddChild,
+  onAddParent,
+  vanshId,
+  persons,
+}: Props) => {
   const [showChildren, setShowChildren] = useState(true);
   const [showActions, setShowActions] = useState(false);
 
@@ -155,6 +162,7 @@ const PersonNode = ({ person, onAddChild, onAddParent, vanshId }: Props) => {
               onAddChild={onAddChild}
               onAddParent={onAddParent}
               vanshId={vanshId}
+              persons={persons}
             />
           ))}
         </div>
@@ -167,6 +175,7 @@ const PersonNode = ({ person, onAddChild, onAddParent, vanshId }: Props) => {
         parentId={person.id}
         onSave={handleChildSave}
         vanshId={vanshId}
+        persons={persons}
       />
 
       <AddChildModal
@@ -175,6 +184,7 @@ const PersonNode = ({ person, onAddChild, onAddParent, vanshId }: Props) => {
         parentId={null}
         onSave={handleParentSave}
         vanshId={vanshId}
+        persons={persons}
       />
     </div>
   );

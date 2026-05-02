@@ -1,12 +1,10 @@
-// app/api/items/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { Family, IFamily } from "../../lib/models/Family";
 import { createDoc, getDocs } from "../../lib/crud";
 import type { ApiResponse } from "../../lib/type/api";
 import { Types } from "mongoose";
 
-// ── GET /api/items ─────────────────────────────────────────────
+// ── GET /api/family ─────────────────────────────────────────────
 export async function GET(request: NextRequest) {
   let message = ""
   try {

@@ -9,7 +9,7 @@ export interface Family {
     isMarried: boolean;
     isAlive: boolean;
     isApproved: boolean;
-    spouse: string[];
+    spouse: [];
     parents: string[] | null;
     children: string[];
 }
@@ -21,7 +21,7 @@ export interface ChildNode {
     dob: string;
     death: string;
     isMarried: boolean;
-    spouse: string[];
+    spouse: [];
     isAlive: boolean;
     isApproved: boolean;
     parents: string[] | null;
@@ -31,22 +31,6 @@ export interface ChildNode {
     vanshId: string;
 }
 
-export interface ChildNode {
-    id: string;
-    name: string;
-    gender: "M" | "F";
-    photo: string;
-    dob: string;
-    death: string;
-    isMarried: boolean;
-    spouse: string[];
-    isAlive: boolean;
-    parents: string[] | null;
-    children: string[];
-    childrenData: ChildNode[];
-    spouseData: unknown[];
-}
-
 export interface FormData {
     name: string;
     gender: "M" | "F";
@@ -54,7 +38,7 @@ export interface FormData {
     dob: string;
     death: string;
     isMarried: boolean;
-    spouse: string[];
+    spouse: string[] | [];
     isAlive: boolean;
     vanshId: string;
 }
@@ -70,7 +54,7 @@ export interface AddChildModalProps {
     onClose: () => void;
     parentId: ParentId;
     onSave: (child: ChildNode) => void;
-    vanshId:string
+    vanshId: string
 }
 export interface IGroup {
     _id: string;

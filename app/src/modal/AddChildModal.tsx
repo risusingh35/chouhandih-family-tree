@@ -1,14 +1,23 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useId } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useId,
+  useMemo,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 import type {
   FormData,
   ChildNode,
   FormErrors,
   AddChildModalProps,
+  Family,
 } from "../types";
 import "../../globals.css";
+
 const DEFAULT_PHOTO = "/images/default.jpeg";
 
 const INITIAL_FORM: FormData = {
@@ -25,17 +34,25 @@ const INITIAL_FORM: FormData = {
 
 const TODAY = new Date().toISOString().split("T")[0];
 
-function validate(form: FormData): FormErrors {
+// ───────────────── VALIDATION ─────────────────
+const validate = (form: FormData): FormErrors => {
   const errors: FormErrors = {};
+
   if (!form.name.trim()) errors.name = "Full name is required.";
   if (!form.dob) errors.dob = "Date of birth is required.";
-  if (!form.isAlive && !form.death)
-    errors.death = "Date of death is required when deceased.";
-  if (!form.isAlive && form.death && form.dob && form.death < form.dob)
-    errors.death = "Date of death cannot be before date of birth.";
-  return errors;
-}
 
+  if (!form.isAlive) {
+    if (!form.death) {
+      errors.death = "Date of death is required when deceased.";
+    } else if (form.dob && form.death < form.dob) {
+      errors.death = "Date of death cannot be before date of birth.";
+    }
+  }
+
+  return errors;
+};
+
+// ───────────────── FIELD ─────────────────
 interface FieldProps {
   label: string;
   required?: boolean;
@@ -53,7 +70,9 @@ const Field = ({ label, required, error, children, htmlFor }: FieldProps) => (
       {label}
       {required && <span className="acm-required">*</span>}
     </label>
+
     {children}
+
     {error && (
       <span role="alert" className="acm-error">
         {error}
@@ -62,58 +81,76 @@ const Field = ({ label, required, error, children, htmlFor }: FieldProps) => (
   </div>
 );
 
+// ───────────────── COMPONENT ─────────────────
 const AddChildModal = ({
   isOpen,
   onClose,
   parentId,
   onSave,
   vanshId,
-}: AddChildModalProps) => {
+  persons = [],
+}: AddChildModalProps & { persons: Family[] }) => {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
+
   const [photoError, setPhotoError] = useState(false);
-  const [spouseInput, setSpouseInput] = useState("");
+
+  // spouse
+  const [spouseMode, setSpouseMode] = useState<"none" | "existing">("none");
+  const [spouseQuery, setSpouseQuery] = useState("");
+  const [selectedSpouse, setSelectedSpouse] = useState<Family | null>(null);
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const formId = useId();
 
+  // ───────────────── EFFECTS ─────────────────
   useEffect(() => {
     if (!isOpen) return;
-    const timer = setTimeout(() => nameInputRef.current?.focus(), 60);
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (isOpen) {
-      setForm(INITIAL_FORM);
-      setErrors({});
-      setTouched(new Set());
-      setPhotoError(false);
-      setSpouseInput("");
-    }
+    const timer = setTimeout(() => nameInputRef.current?.focus(), 60);
+
+    setForm(INITIAL_FORM);
+    setErrors({});
+    setTouched(new Set());
+    setPhotoError(false);
+    setSpouseMode("none");
+    setSelectedSpouse(null);
+    setSpouseQuery("");
+
+    return () => clearTimeout(timer);
   }, [isOpen]);
 
   useEffect(() => {
-    if (form.isAlive) setForm((prev) => ({ ...prev, death: "" }));
+    if (form.isAlive) {
+      setForm((prev) => (prev.death ? { ...prev, death: "" } : prev));
+    }
   }, [form.isAlive]);
 
   useEffect(() => {
-    if (touched.size > 0) setErrors(validate(form));
+    if (touched.size) setErrors(validate(form));
   }, [form, touched]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!dropdownRef.current?.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ───────────────── HANDLERS ─────────────────
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { name, value, type } = e.target;
-      const checked =
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : false;
+      const checked = (e.target as HTMLInputElement).checked;
+
       setForm((prev) => ({
         ...prev,
         [name]: type === "checkbox" ? checked : value,
@@ -126,33 +163,30 @@ const AddChildModal = ({
     setTouched((prev) => new Set(prev).add(name));
   }, []);
 
-  const handleSpouseChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const raw = e.target.value;
-      setSpouseInput(raw);
-      setForm((prev) => ({
-        ...prev,
-        spouse: raw
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-      }));
-    },
-    [],
-  );
+  // ───────────────── MEMO ─────────────────
+  const filteredSpouse = useMemo(() => {
+    if (!spouseQuery.trim()) return persons;
 
+    return persons.filter((p) =>
+      p.name.toLowerCase().includes(spouseQuery.toLowerCase()),
+    );
+  }, [spouseQuery, persons]);
+
+  // ───────────────── SAVE ─────────────────
   const handleSave = () => {
-    const allTouched = new Set(["name", "dob", "death"]);
-    setTouched(allTouched);
     const errs = validate(form);
     setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+
+    if (Object.keys(errs).length) return;
+
+    const spouseIds = selectedSpouse ? [selectedSpouse.id] : [];
 
     const newChild: ChildNode = {
       id: uuidv4(),
       ...form,
-      parents: parentId ? [parentId] : null,
+      parents: parentId ? [parentId] : [],
       children: [],
+      spouse: spouseIds as [],
       isApproved: false,
       childrenData: [],
       spouseData: [],
@@ -163,38 +197,21 @@ const AddChildModal = ({
     onClose();
   };
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose();
-  };
-
   if (!isOpen) return null;
 
   const hasErrors = Object.keys(errors).length > 0;
 
+  // ───────────────── UI ─────────────────
   return (
-    <div
-      className="acm-backdrop"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={`${formId}-title`}
-      onClick={handleBackdropClick}
-    >
+    <div className="acm-backdrop">
       <div className="acm-panel">
         <div className="acm-header">
-          <div>
-            <p className="acm-subtitle">Family Tree</p>
-            <h2 id={`${formId}-title`} className="acm-title">
-              Add New Child
-            </h2>
-          </div>
-
-          <button onClick={onClose} className="acm-close">
-            ✕
-          </button>
+          <h2>Add New Child</h2>
+          <button onClick={onClose}>✕</button>
         </div>
 
         <div className="acm-body">
-          {/* Photo */}
+          {/* PHOTO */}
           <div className="acm-photo-row">
             <div className="acm-avatar">
               {!photoError && form.photo ? (
@@ -204,24 +221,22 @@ const AddChildModal = ({
                   onError={() => setPhotoError(true)}
                 />
               ) : (
-                <span className="acm-avatar-fallback">👤</span>
+                <span>👤</span>
               )}
             </div>
 
-            <div className="acm-flex-1">
-              <label className="acm-label">Photo URL</label>
-              <input
-                name="photo"
-                value={form.photo}
-                onChange={(e) => {
-                  setPhotoError(false);
-                  handleChange(e);
-                }}
-                className="acm-input"
-              />
-            </div>
+            <input
+              name="photo"
+              value={form.photo}
+              onChange={(e) => {
+                setPhotoError(false);
+                handleChange(e);
+              }}
+              className="acm-input"
+            />
           </div>
-          {/* Name */}
+
+          {/* NAME */}
           <Field
             label="Full Name"
             required
@@ -233,12 +248,27 @@ const AddChildModal = ({
               value={form.name}
               onChange={handleChange}
               onBlur={() => markTouched("name")}
-              className={`acm-input ${
-                touched.has("name") && errors.name ? "acm-input-error" : ""
-              }`}
+              className="acm-input"
             />
           </Field>
-          {/* Gender */}
+
+          {/* DOB */}
+          <Field
+            label="Date of Birth"
+            required
+            error={touched.has("dob") ? errors.dob : undefined}
+          >
+            <input
+              name="dob"
+              value={form.dob}
+              onChange={handleChange}
+              type="date"
+              max={TODAY}
+              className="acm-input"
+            />
+          </Field>
+
+          {/* GENDER */}
           <div className="acm-row">
             {(["M", "F"] as const).map((g) => (
               <label key={g} className="acm-toggle-pill">
@@ -255,66 +285,8 @@ const AddChildModal = ({
               </label>
             ))}
           </div>
-          {/* DOB */}
-          <Field
-            label="Date of Birth"
-            required
-            error={touched.has("dob") ? errors.dob : undefined}
-          >
-            <input
-              name="dob"
-              value={form.dob}
-              onChange={handleChange}
-              onBlur={() => markTouched("dob")}
-              type="date"
-              max={TODAY}
-              className={`acm-input ${
-                touched.has("dob") && errors.dob ? "acm-input-error" : ""
-              }`}
-            />
-          </Field>
-          {/* Alive toggle  */}
-          <Field label="Status" htmlFor={`${formId}-alive`}>
-            <button
-              id={`${formId}-alive`}
-              type="button"
-              role="switch"
-              aria-checked={form.isAlive}
-              onClick={() =>
-                setForm((prev) => ({ ...prev, isAlive: !prev.isAlive }))
-              }
-              className={`acm-status-btn ${form.isAlive ? "alive" : "dead"}`}
-            >
-              <span className="acm-status-track">
-                <span className="acm-status-thumb" />
-              </span>
-              {form.isAlive ? "Alive" : "Deceased"}
-            </button>
-          </Field>
-          {/*  Date of death */}
-          {!form.isAlive && (
-            <Field
-              label="Date of Death"
-              required
-              error={touched.has("death") ? errors.death : undefined}
-              htmlFor={`${formId}-death`}
-            >
-              <input
-                id={`${formId}-death`}
-                name="death"
-                value={form.death}
-                onChange={handleChange}
-                onBlur={() => markTouched("death")}
-                type="date"
-                min={form.dob || undefined}
-                max={TODAY}
-                className={`acm-input ${
-                  touched.has("death") && errors.death ? "acm-input-error" : ""
-                }`}
-              />
-            </Field>
-          )}
-          {/* /* Married toggle */}
+
+          {/* MARRIED */}
           <Field label="Marital Status">
             <button
               type="button"
@@ -329,24 +301,85 @@ const AddChildModal = ({
               }
               className={`acm-married-btn ${form.isMarried ? "active" : ""}`}
             >
-              <svg width="15" height="15" viewBox="0 0 15 15">
-                <path d="M7.5 13C7.5 13 2 9.5 2 5.5C2 3.567 3.567 2 5.5 2C6.5 2 7.5 2.5 7.5 2.5C7.5 2.5 8.5 2 9.5 2C11.433 2 13 3.567 13 5.5C13 9.5 7.5 13 7.5 13Z" />
-              </svg>
               {form.isMarried ? "Married" : "Mark as Married"}
             </button>
           </Field>
+
+          {/* SPOUSE */}
+          {form.isMarried && (
+            <div className="acm-field">
+              <label className="acm-label">Spouse</label>
+
+              {spouseMode === "none" && (
+                <button onClick={() => setSpouseMode("existing")}>
+                  Select Existing
+                </button>
+              )}
+
+              {spouseMode === "existing" && (
+                <div className="acm-dropdown" ref={dropdownRef}>
+                  <input
+                    className="acm-input"
+                    placeholder="Search spouse..."
+                    value={spouseQuery}
+                    onChange={(e) => setSpouseQuery(e.target.value)}
+                    onFocus={() => setDropdownOpen(true)}
+                  />
+
+                  {dropdownOpen && (
+                    <div className="acm-dropdown-list">
+                      {filteredSpouse.length === 0 && (
+                        <div className="acm-dropdown-empty">
+                          No results found
+                        </div>
+                      )}
+
+                      {filteredSpouse.map((p) => (
+                        <div
+                          key={p.id}
+                          className={`acm-dropdown-item ${
+                            selectedSpouse?.id === p.id ? "selected" : ""
+                          }`}
+                          onClick={() => {
+                            setSelectedSpouse(p);
+                            setSpouseQuery(p.name);
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          <img src={p.photo} className="acm-avatar-sm" />
+                          <div className="acm-flex-col">
+                            <span>{p.name}</span>
+                            <span>{p.gender === "M" ? "Male" : "Female"}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {selectedSpouse && (
+                    <div className="acm-selected">
+                      Selected: <strong>{selectedSpouse.name}</strong>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedSpouse(null);
+                          setSpouseQuery("");
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="acm-footer">
-          <button onClick={onClose} className="acm-btn-cancel">
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={hasErrors && touched.size > 0}
-            className="acm-btn-save"
-          >
-            Save Child
+          <button onClick={onClose}>Cancel</button>
+          <button onClick={handleSave} disabled={hasErrors}>
+            Save
           </button>
         </div>
       </div>

@@ -96,6 +96,7 @@ export const FamilyPage = () => {
           onAddChild={handleAddPerson}
           onAddParent={handleAddParent}
           vanshId={vanshId}
+          persons={persons}
         />
       </div>
     </div>

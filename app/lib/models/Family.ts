@@ -10,7 +10,7 @@ export interface IFamily extends Document {
   isAlive: boolean;
   isApproved: boolean;
   spouse: Types.ObjectId[];
-  parents: Types.ObjectId[];
+  parents: Types.ObjectId;
   children: Types.ObjectId[];
   approvedBy?: Types.ObjectId | null;
   vanshId?: Types.ObjectId | null;
@@ -64,9 +64,6 @@ const FamilySchema: Schema<IFamily> = new Schema(
       default: false,
     },
 
-    /**
-     * Relations (Self referencing)
-     */
     spouse: [
       {
         type: Schema.Types.ObjectId,
@@ -90,7 +87,7 @@ const FamilySchema: Schema<IFamily> = new Schema(
     vanshId: {
       type: Schema.Types.ObjectId,
       ref: "Vansh",
-      required: true, 
+      required: true,
       default: null,
       index: true,
     },
