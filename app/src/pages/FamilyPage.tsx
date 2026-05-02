@@ -1,12 +1,12 @@
+//  // ✅ Add Child
+
+//
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import {
-  buildTree,
-  addChildToPersons,
-  addParentToPersons,
-} from "../utils/buildTree";
+import { buildTree, addChildToPersons } from "../utils/buildTree";
 import PersonNode from "../components/PersonNode";
 import type { Family, ParentId } from "../types";
 
@@ -16,9 +16,11 @@ export const FamilyPage = () => {
 
   const [persons, setPersons] = useState<Family[]>([]);
   const [loading, setLoading] = useState(true);
-  const [reload, setReload] = useState(false);
+  const [reload, setReload] = useState(true);
 
-  // ✅ Add Child
+  // ✅ GLOBAL ACTIVE NODE
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+
   const handleAddPerson = (parentId: ParentId, child: Family) => {
     const addChild = async () => {
       await addChildToPersons(persons, parentId, child);
@@ -26,94 +28,53 @@ export const FamilyPage = () => {
     };
     addChild();
   };
-  // ✅ Add Parent
-  const handleAddParent = useCallback((childId: ParentId, parent: Family) => {
-    setPersons((prev) => addParentToPersons([...prev], childId, parent));
-  }, []);
 
-  // ─── Fetch Data ─────────────────────────────────────
   useEffect(() => {
     const fetchFamily = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/family?vanshId=${vanshId}`);
-        const json = await res.json();
-        const formatted: Family[] = (json.data || []).map((f: any) => ({
-          id: f._id?.toString(),
-          name: f.name,
-          gender: f.gender,
-          photo: f.photo,
-          dob: f.dob,
-          death: f.death,
-          isMarried: f.isMarried,
-          isAlive: f.isAlive,
-          isApproved: f.isApproved,
+      setLoading(true);
 
-          spouse: f?.spouse
-            ? Array.isArray(f.spouse)
-              ? f.spouse.map((id: any) => id.toString())
-              : [f.spouse.toString()]
-            : [],
+      const res = await fetch(`/api/family?vanshId=${vanshId}`);
+      const json = await res.json();
 
-          parents: Array.isArray(f?.parents)
-            ? f.parents.map((id: any) => id.toString())
-            : [],
+      const formatted: Family[] = (json.data || []).map((f: any) => ({
+        id: f._id?.toString(),
+        name: f.name,
+        gender: f.gender,
+        photo: f.photo,
+        dob: f.dob,
+        death: f.death,
+        isMarried: f.isMarried,
+        isAlive: f.isAlive,
+        spouse: Array.isArray(f.spouse) ? f.spouse : [],
+        parents: Array.isArray(f.parents) ? f.parents : [],
+        children: [],
+      }));
 
-          children: Array.isArray(f?.children)
-            ? f.children.map((id: any) => id.toString())
-            : [],
-        }));
-
-        setPersons(formatted);
-      } catch (err) {
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
+      setPersons(formatted);
+      setLoading(false);
     };
 
     fetchFamily();
   }, [vanshId, reload]);
 
-  // ─── Build Tree ─────────────────────────────────────
   const tree = useMemo(() => buildTree(persons), [persons]);
-  console.log("tree-----------------------", tree);
-  // ─── Loading ────────────────────────────────────────
-  if (loading) {
-    return <div style={{ padding: 40 }}>Loading family...</div>;
-  }
 
-  // ─── Empty State ────────────────────────────────────
-  if (!tree) {
-    return (
-      <div style={{ padding: 40 }}>
-        <h2>No family data found</h2>
-      </div>
-    );
-  }
+  if (loading) return <div style={{ padding: 40 }}>Loading...</div>;
+  if (!tree) return <div>No Data</div>;
 
-  // ─── UI ─────────────────────────────────────────────
   return (
-    <div
-      style={{
-        padding: 24,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center", // 🔥 center tree
-      }}
-    >
+    <div style={{ padding: 24, textAlign: "center" }}>
       <h1>Family Tree</h1>
 
-      {/* 🔥 TREE ROOT */}
-      <div style={{ marginTop: 20 }}>
-        <PersonNode
-          person={tree}
-          onAddChild={handleAddPerson}
-          onAddParent={handleAddParent}
-          vanshId={vanshId}
-          persons={persons}
-        />
-      </div>
+      <PersonNode
+        person={tree}
+        persons={persons}
+        vanshId={vanshId}
+        onAddChild={handleAddPerson}
+        onAddParent={() => {}}
+        activeNodeId={activeNodeId}
+        setActiveNodeId={setActiveNodeId}
+      />
     </div>
   );
 };
