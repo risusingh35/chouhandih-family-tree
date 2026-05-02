@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Family, IFamily } from "../../lib/models/Family";
-import { createDoc, getDocs } from "../../lib/crud";
+import { createDoc, getDocs, updateDoc } from "../../lib/crud";
 import type { ApiResponse } from "../../lib/type/api";
 import { Types } from "mongoose";
 
@@ -65,28 +65,21 @@ export async function POST(request: NextRequest) {
     // ── NORMALIZE ONLY (no heavy validation) ──
     const payload = body as IFamily; // 1:1 mapping, so we can skip heavy validation for now
 
-    const item = await createDoc(Family, payload);
-
-    // ── RELATION SYNC (minimal but critical) ──
-
-    // // parent → child
-    // if (payload.parents?.length) {
-    //   await Family.updateMany(
-    //     { _id: { $in: payload.parents } },
-    //     { $addToSet: { children: item._id } }
-    //   );
-    // }
+    const newFamily = await createDoc(Family, payload);
 
     // spouse ↔ spouse
-    if (payload.spouse?.length) {
-      await Family.updateMany(
-        { _id: { $in: payload.spouse } },
-        { $addToSet: { spouse: item._id } }
+    if (payload.spouse?.length && newFamily._id) {
+      await Promise.all(
+        payload.spouse.map((spouseId) =>
+          updateDoc(Family, spouseId.toString(), {
+            spouse: [newFamily._id], // keep schema consistent
+          })
+        )
       );
     }
 
-    return NextResponse.json<ApiResponse<typeof item>>(
-      { success: true, data: item },
+    return NextResponse.json<ApiResponse<typeof newFamily>>(
+      { success: true, data: newFamily },
       { status: 201 }
     );
   } catch (error) {
