@@ -9,7 +9,7 @@ export interface Family {
     isMarried: boolean;
     isAlive: boolean;
     isApproved: boolean;
-    spouse: [];
+    spouse: string[] | null;
     parents: string[] | null;
     children: string[];
 }
@@ -21,7 +21,7 @@ export interface ChildNode {
     dob: string;
     death: string;
     isMarried: boolean;
-    spouse: [];
+    spouse: string[] | null;
     isAlive: boolean;
     isApproved: boolean;
     parents: string[] | null;
@@ -38,7 +38,7 @@ export interface FormData {
     dob: string;
     death: string;
     isMarried: boolean;
-    spouse: string[] | [];
+    spouse: string[] | null;
     isAlive: boolean;
     vanshId: string;
 }

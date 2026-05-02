@@ -17,16 +17,23 @@ export const FamilyPage = () => {
   const [persons, setPersons] = useState<Family[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Add Child
-  const handleAddPerson = (parentId: ParentId, child: Family) => {
-    addChildToPersons(persons, parentId, child);
+  // 🔥 GLOBAL ACTIVE NODE (fix double click issue)
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
 
-    // setPersons((prev) => );
-  };
+  // ✅ Add Child (FIX: must trigger re-render)
+  const handleAddPerson = useCallback((parentId: ParentId, child: Family) => {
+    setPersons((prev) => {
+      const cloned = structuredClone(prev); // 🔥 avoid mutation bugs
+      return addChildToPersons(cloned, parentId, child);
+    });
+  }, []);
 
   // ✅ Add Parent
   const handleAddParent = useCallback((childId: ParentId, parent: Family) => {
-    setPersons((prev) => addParentToPersons(prev, childId, parent));
+    setPersons((prev) => {
+      const cloned = structuredClone(prev); // 🔥 avoid mutation bugs
+      return addParentToPersons(cloned, childId, parent);
+    });
   }, []);
 
   // ─── Fetch Data ─────────────────────────────────────
@@ -37,11 +44,9 @@ export const FamilyPage = () => {
 
         const res = await fetch(`/api/family?vanshId=${vanshId}`);
         const json = await res.json();
-        console.log("json-------------", json);
 
-        // ✅ normalize Mongo → UI
         const formatted: Family[] = (json.data || []).map((f: any) => ({
-          id: f._id?.toString(), // 🔥 IMPORTANT FIX
+          id: f._id?.toString(),
           name: f.name,
           gender: f.gender,
           photo: f.photo,
@@ -51,10 +56,17 @@ export const FamilyPage = () => {
           isAlive: f.isAlive,
           isApproved: f.isApproved,
 
-          // 🔥 convert ObjectId[] → string[]
-          spouse: (f.spouse || []).map((id: any) => id.toString()),
-          parents: (f.parents || []).map((id: any) => id.toString()),
-          children: (f.children || []).map((id: any) => id.toString()),
+          spouse: Array.isArray(f?.spouse)
+            ? f.spouse.map((id: any) => id.toString())
+            : [],
+
+          parents: Array.isArray(f?.parents)
+            ? f.parents.map((id: any) => id.toString())
+            : [],
+
+          children: Array.isArray(f?.children)
+            ? f.children.map((id: any) => id.toString())
+            : [],
         }));
 
         setPersons(formatted);
@@ -66,7 +78,7 @@ export const FamilyPage = () => {
     };
 
     fetchFamily();
-  }, []);
+  }, [vanshId]);
 
   // ─── Build Tree ─────────────────────────────────────
   const tree = useMemo(() => buildTree(persons), [persons]);
@@ -87,9 +99,17 @@ export const FamilyPage = () => {
 
   // ─── UI ─────────────────────────────────────────────
   return (
-    <div style={{ padding: 24 }}>
+    <div
+      style={{
+        padding: 24,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center", // 🔥 center tree
+      }}
+    >
       <h1>Family Tree</h1>
 
+      {/* 🔥 TREE ROOT */}
       <div style={{ marginTop: 20 }}>
         <PersonNode
           person={tree}
@@ -97,6 +117,8 @@ export const FamilyPage = () => {
           onAddParent={handleAddParent}
           vanshId={vanshId}
           persons={persons}
+          activeNodeId={activeNodeId}
+          setActiveNodeId={setActiveNodeId}
         />
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import GroupSelectPage from "./src/components/GroupSelectPage";
-import FamilyTreeView from "./src/components/Familytreeview";
+import FamilyTreeView from "./src/components/FamilytreeviewDump";
 import personsData from "../public/data/family.json";
 import type { Family } from "./src/types";
 

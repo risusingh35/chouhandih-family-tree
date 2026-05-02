@@ -9,8 +9,8 @@ export interface IFamily extends Document {
   isMarried: boolean;
   isAlive: boolean;
   isApproved: boolean;
-  spouse: Types.ObjectId[];
-  parents: Types.ObjectId;
+  spouse: Types.ObjectId[] | null;
+  parents: Types.ObjectId[];
   children: Types.ObjectId[];
   approvedBy?: Types.ObjectId | null;
   vanshId?: Types.ObjectId | null;
@@ -103,6 +103,7 @@ const FamilySchema: Schema<IFamily> = new Schema(
   {
     timestamps: true,
     versionKey: false,
+    strict: true, //  ensure unknown fields are removed
   }
 );
 export const Family = models.Family || model("Family", FamilySchema);

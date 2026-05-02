@@ -63,7 +63,28 @@ export async function POST(request: NextRequest) {
   try {
     const body: Partial<IFamily> = await request.json();
 
-    const item = await createDoc(Family, body);
+    // ── NORMALIZE ONLY (no heavy validation) ──
+    const payload = body as IFamily; // 1:1 mapping, so we can skip heavy validation for now
+
+    const item = await createDoc(Family, payload);
+
+    // ── RELATION SYNC (minimal but critical) ──
+
+    // // parent → child
+    // if (payload.parents?.length) {
+    //   await Family.updateMany(
+    //     { _id: { $in: payload.parents } },
+    //     { $addToSet: { children: item._id } }
+    //   );
+    // }
+
+    // spouse ↔ spouse
+    if (payload.spouse?.length) {
+      await Family.updateMany(
+        { _id: { $in: payload.spouse } },
+        { $addToSet: { spouse: item._id } }
+      );
+    }
 
     return NextResponse.json<ApiResponse<typeof item>>(
       { success: true, data: item },
@@ -73,12 +94,9 @@ export async function POST(request: NextRequest) {
     const message =
       error instanceof Error ? error.message : "Unknown error";
 
-    const isValidation =
-      (error as { name?: string }).name === "ValidationError";
-
     return NextResponse.json<ApiResponse<never>>(
       { success: false, error: message },
-      { status: isValidation ? 400 : 500 }
+      { status: 500 }
     );
   }
 }

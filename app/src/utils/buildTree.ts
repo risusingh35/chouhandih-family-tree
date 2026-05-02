@@ -74,7 +74,7 @@ export async function addChildToPersons(
   persons: Family[],
   parentId: ParentId,
   child: Family
-): Promise<Family[]> {
+): Promise<Family[]> {  
 
   if (!parentId || !child?.id) return persons;
   // save data in db

@@ -138,24 +138,30 @@ export const ClansPage = () => {
   useEffect(() => {
     if (!groupId) return;
 
+    let mounted = true;
+
     const fetchData = async () => {
       setLoading(true);
-
       const res = await fetch(`/api/clan?groupId=${groupId}`);
       const json = await res.json();
-      const clans: Clan[] = (json.data || [])
-    
+
+      if (!mounted) return;
+
       setGroup({
         id: groupId,
         name: json.group?.name || "Clans",
         description: json.group?.description || "",
-        clans,
+        clans: json.data || [],
       });
 
       setLoading(false);
     };
 
     fetchData();
+
+    return () => {
+      mounted = false;
+    };
   }, [groupId]);
 
   // ─── Filter Logic ───────────────────────────────────────────────────────
@@ -221,8 +227,8 @@ export const ClansPage = () => {
           marginTop: 20,
         }}
       >
-        {filteredClans.map((clan,i) => (
-          <ClanCard key={i} clan={clan} />
+        {filteredClans.map((clan, i) => (
+          <ClanCard key={clan?.id + "" + i} clan={clan} />
         ))}
       </div>
     </div>

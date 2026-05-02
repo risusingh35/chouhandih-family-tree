@@ -27,7 +27,7 @@ const INITIAL_FORM: FormData = {
   dob: "",
   death: "",
   isMarried: false,
-  spouse: [],
+  spouse: null,
   isAlive: true,
   vanshId: "",
 };
@@ -164,13 +164,15 @@ const AddChildModal = ({
   }, []);
 
   // ───────────────── MEMO ─────────────────
-  const filteredSpouse = useMemo(() => {
-    if (!spouseQuery.trim()) return persons;
+const filteredSpouse = useMemo(() => {
+  const targetGender = form.gender === "M" ? "F" : "M";
 
-    return persons.filter((p) =>
-      p.name.toLowerCase().includes(spouseQuery.toLowerCase()),
+  return persons
+    .filter((p) => p.gender === targetGender) // 🔥 gender filter
+    .filter((p) =>
+      p.name.toLowerCase().includes(spouseQuery.toLowerCase())
     );
-  }, [spouseQuery, persons]);
+}, [spouseQuery, persons, form.gender]);
 
   // ───────────────── SAVE ─────────────────
   const handleSave = () => {
@@ -180,18 +182,20 @@ const AddChildModal = ({
     if (Object.keys(errs).length) return;
 
     const spouseIds = selectedSpouse ? [selectedSpouse.id] : [];
+    console.log("spouseIds-------------", spouseIds);
 
     const newChild: ChildNode = {
       id: uuidv4(),
       ...form,
       parents: parentId ? [parentId] : [],
       children: [],
-      spouse: spouseIds as [],
+      spouse: spouseIds.length ? (spouseIds as []) : null,
       isApproved: false,
       childrenData: [],
       spouseData: [],
       vanshId,
     };
+    console.log("newChild------------", newChild);
 
     onSave(newChild);
     onClose();

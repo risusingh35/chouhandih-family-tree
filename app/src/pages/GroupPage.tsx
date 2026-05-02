@@ -11,14 +11,21 @@ const GroupPage = () => {
   const [group, setGroup] = useState<IGroup | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchGroup = async () => {
-      const res = await fetch("/api/groups");
-      const json = await res.json();
-      setGroup(json.data[0]);
-    };
-    fetchGroup();
-  }, []);
+ useEffect(() => {
+  let mounted = true;
+
+  const fetchGroup = async () => {
+    const res = await fetch("/api/groups");
+    const json = await res.json();
+    if (mounted) setGroup(json.data[0]);
+  };
+
+  fetchGroup();
+
+  return () => {
+    mounted = false;
+  };
+}, []);
 
   if (!group) return null;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import AddChildModal from "../modal/AddChildModal";
 import type { PersonNode as PersonNodeType, Family, ParentId } from "../types";
 
@@ -21,154 +21,127 @@ const PersonNode = ({
   vanshId,
   persons,
 }: Props) => {
-  const [showChildren, setShowChildren] = useState(true);
   const [showActions, setShowActions] = useState(false);
+  const [showChildren, setShowChildren] = useState(true);
 
   const [childModal, setChildModal] = useState(false);
   const [parentModal, setParentModal] = useState(false);
 
   const nodeRef = useRef<HTMLDivElement>(null);
 
-  // close actions on outside click
+  // ─── FIX: outside click ─────────────────
   useEffect(() => {
-    if (!showActions) return;
     const handler = (e: MouseEvent) => {
-      if (nodeRef.current && !nodeRef.current.contains(e.target as Node)) {
+      if (!nodeRef.current?.contains(e.target as Node)) {
         setShowActions(false);
       }
     };
+
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [showActions]);
+  }, []);
 
-  // add child
+  // ─── spouse resolve ─────────────────
+  const spouse = useMemo(() => {
+    if (!person.spouse?.length) return null;
+    return persons.find((p) => p.id === person.spouse[0]) || null;
+  }, [person.spouse, persons]);
+
   const handleChildSave = (child: Family) => {
     onAddChild(person.id, child);
     setShowChildren(true);
   };
 
-  // add parent
   const handleParentSave = useCallback(
     (parent: Family) => {
+      alert("Clicked handleParentSave:" + person.id);
       onAddParent(person.id, parent);
     },
     [person.id, onAddParent],
   );
 
-  const borderColor = person.gender === "F" ? "#e91e63" : "#2196f3"; // pink / blue
+  const borderColor = person.gender === "F" ? "#e91e63" : "#2196f3";
 
+  // ───────────────── UI ─────────────────
   return (
-    <div style={{ textAlign: "center", margin: 20 }}>
-      {/* PERSON CARD */}
-      <div
-        ref={nodeRef}
-        onClick={() => setShowActions((v) => !v)}
-        style={{
-          display: "inline-block",
-          cursor: "pointer",
-          padding: 10,
-          borderRadius: 12,
-          background: "#fff",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          border: `2px solid ${borderColor}`,
-          transition: "0.2s",
-        }}
-      >
-        {/* IMAGE */}
-        <div
-          style={{
-            width: 70,
-            height: 70,
-            borderRadius: "50%",
-            overflow: "hidden",
-            margin: "0 auto",
-            border: `3px solid ${borderColor}`,
-          }}
-        >
-          <img
-            src={person.photo || DEFAULT_IMG}
-            alt={person.name}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
+    <div style={{ textAlign: "center", margin: 24 }}>
+      {/* ================= PERSON + SPOUSE ================= */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
+        {/* MAIN PERSON */}
+        <Card
+          person={person}
+          borderColor={borderColor}
+          showActions={showActions}
+          setShowActions={setShowActions}
+          nodeRef={nodeRef}
+          onAddChild={() => setChildModal(true)}
+          onAddParent={() => setParentModal(true)}
+          onToggleChildren={() => setShowChildren((v) => !v)}
+          hasChildren={!!person.childrenData?.length}
+        />
+
+        {/* SPOUSE */}
+        {spouse && (
+          <Card
+            person={spouse}
+            borderColor={spouse.gender === "F" ? "#e91e63" : "#2196f3"}
+            isSpouse
           />
-        </div>
-
-        {/* NAME */}
-        <div
-          style={{
-            marginTop: 8,
-            fontSize: 14,
-            fontWeight: 600,
-          }}
-        >
-          {person.name}
-        </div>
-
-        {/* GENDER ICON */}
-        <div style={{ fontSize: 12, color: borderColor }}>
-          {person.gender === "F" ? "♀ Female" : "♂ Male"}
-        </div>
-
-        {/* ACTIONS */}
-        {showActions && (
-          <div
-            style={{
-              marginTop: 10,
-              display: "flex",
-              flexDirection: "column",
-              gap: 6,
-            }}
-          >
-            {(person?.parents?.length || 0) > 0 && (
-              <button onClick={() => setParentModal(true)}>⬆ Add Parent</button>
-            )}
-            <button onClick={() => setChildModal(true)}>⬇ Add Child</button>
-            <button onClick={() => setShowChildren((v) => !v)}>
-              Toggle Children
-            </button>
-          </div>
         )}
       </div>
 
-      {/* CONNECTOR */}
+      {/* ================= CONNECTOR ================= */}
       {person.childrenData?.length > 0 && (
-        <div
-          style={{
-            width: 2,
-            height: 20,
-            background: "#999",
-            margin: "0 auto",
-          }}
-        />
+        <svg width="100%" height="40">
+          <line
+            x1="50%"
+            y1="0"
+            x2="50%"
+            y2="40"
+            stroke="#bbb"
+            strokeWidth="2"
+          />
+        </svg>
       )}
 
-      {/* CHILDREN */}
+      {/* ================= CHILDREN ================= */}
       {showChildren && person.childrenData?.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 20,
-            marginTop: 10,
-          }}
-        >
-          {person.childrenData.map((child) => (
-            <PersonNode
-              key={child.id}
-              person={child}
-              onAddChild={onAddChild}
-              onAddParent={onAddParent}
-              vanshId={vanshId}
-              persons={persons}
+        <div style={{ marginTop: 10 }}>
+          {/* horizontal line */}
+          <svg width="100%" height="20">
+            <line
+              x1="10%"
+              y1="10"
+              x2="90%"
+              y2="10"
+              stroke="#bbb"
+              strokeWidth="2"
             />
-          ))}
+          </svg>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 30,
+              flexWrap: "wrap",
+            }}
+          >
+            {person.childrenData.map((child) => (
+              <PersonNode
+                key={child.id}
+                person={child}
+                onAddChild={onAddChild}
+                onAddParent={onAddParent}
+                vanshId={vanshId}
+                persons={persons}
+              />
+            ))}
+          </div>
         </div>
       )}
 
-      {/* MODALS */}
+      {/* ================= MODALS ================= */}
       <AddChildModal
         isOpen={childModal}
         onClose={() => setChildModal(false)}
@@ -191,3 +164,81 @@ const PersonNode = ({
 };
 
 export default PersonNode;
+
+const Card = ({
+  person,
+  borderColor,
+  showActions,
+  setShowActions,
+  nodeRef,
+  onAddChild,
+  onAddParent,
+  onToggleChildren,
+  hasChildren,
+  isSpouse = false,
+}: any) => {
+  return (
+    <div
+      ref={nodeRef}
+      onClick={(e) => {
+        e.stopPropagation(); // 🔥 FIX double click bug
+        setShowActions?.((v: boolean) => !v);
+      }}
+      style={{
+        cursor: isSpouse ? "default" : "pointer",
+        padding: 12,
+        borderRadius: 16,
+        background: "#fff",
+        boxShadow: showActions
+          ? "0 12px 28px rgba(0,0,0,0.18)"
+          : "0 4px 12px rgba(0,0,0,0.08)",
+        border: `2px solid ${borderColor}`,
+        minWidth: 140,
+        position: "relative",
+      }}
+    >
+      {/* PHOTO */}
+      <div
+        style={{
+          width: 70,
+          height: 70,
+          borderRadius: "50%",
+          overflow: "hidden",
+          margin: "0 auto",
+          border: `3px solid ${borderColor}`,
+          position: "relative",
+        }}
+      >
+        <img
+          src={person.photo || DEFAULT_IMG}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+
+        {/* 🔥 deceased overlay */}
+        {!person.isAlive && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "50%",
+              border: "3px solid rgba(255,0,0,0.5)",
+            }}
+          />
+        )}
+      </div>
+
+      {/* NAME */}
+      <div style={{ marginTop: 8, fontWeight: 600 }}>{person.name}</div>
+
+      {/* ACTIONS */}
+      {!isSpouse && showActions && (
+        <div style={{ marginTop: 10 }}>
+          <button onClick={onAddChild}>Add Child</button>
+          <button onClick={onAddParent}>Add Parent</button>
+
+          {hasChildren && <button onClick={onToggleChildren}>Toggle</button>}
+        </div>
+      )}
+    </div>
+  );
+};
