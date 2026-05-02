@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Family } from "../types";
+import AddChildModal from "../modal/AddChildModal";
 
 const DEFAULT_IMG = "/images/default.jpeg";
 
@@ -154,7 +155,23 @@ const ActionBtn = ({
 
 /* ─────────────────────────────── Card ───────────────────────────────── */
 
-const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
+const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
+  const [childModal, setChildModal] = useState(false);
+  const [parentModal, setParentModal] = useState(false);
+  const [showChildren, setShowChildren] = useState(true);
+  // add child
+  const handleChildSave = (child: Family) => {
+    onAddChild(person.id, child);
+    setShowChildren(true);
+  };
+
+  // add parent
+  const handleParentSave = useCallback(
+    (parent: Family) => {
+      onAddParent(person.id, parent);
+    },
+    [person.id, onAddParent],
+  );
   const spouse = useMemo(
     () => persons.find((p: Family) => p.id === person.spouse?.[0]),
     [person, persons],
@@ -201,7 +218,6 @@ const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
           Deceased
         </div>
       )}
-
       {/* PHOTO + BADGES */}
       <div
         style={{
@@ -235,7 +251,6 @@ const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
           <GenderBadge gender={person.gender} />
         </div>
       </div>
-
       {/* NAME */}
       <div
         style={{
@@ -250,7 +265,6 @@ const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
       >
         {person.name}
       </div>
-
       {/* DOB subtitle always visible */}
       {person.dob && (
         <div
@@ -264,7 +278,6 @@ const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
           {person.dob}
         </div>
       )}
-
       {/* DETAILS (expanded) */}
       {
         <>
@@ -316,7 +329,7 @@ const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
             <ActionBtn
               onClick={(e) => {
                 e.stopPropagation();
-                onAddChild?.();
+                setChildModal(true);
               }}
               icon="＋"
               label="Add Child"
@@ -324,7 +337,7 @@ const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
             <ActionBtn
               onClick={(e) => {
                 e.stopPropagation();
-                onAddParent?.();
+                setShowChildren((v) => !v);
               }}
               icon="↑"
               label="Add Parent"
@@ -342,6 +355,23 @@ const Card = ({ person, persons, onAddChild, onAddParent }: any) => {
           </div>
         </>
       }
+      {/* MODALS */}
+      <AddChildModal
+        isOpen={childModal}
+        onClose={() => setChildModal(false)}
+        parentId={person.id}
+        onSave={handleChildSave}
+        vanshId={vanshId}
+        persons={persons}
+      />{" "}
+      <AddChildModal
+        isOpen={parentModal}
+        onClose={() => setParentModal(false)}
+        parentId={null}
+        onSave={handleParentSave}
+        vanshId={vanshId}
+        persons={persons}
+      />
     </div>
   );
 };

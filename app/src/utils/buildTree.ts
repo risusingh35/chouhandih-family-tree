@@ -38,25 +38,10 @@ export function buildTree(persons: Family[]): PersonNode | null {
       }
     });
   });
-
-  // ❌ REMOVE THIS BLOCK COMPLETELY
-  /*
-  persons.forEach((p) => {
-    const node = map[p.id];
-
-    node.spouseData =
-      p.spouse?.map((id) => map[id]).filter(Boolean) || [];
-  });
-  */
-
   // ─── Root Detection ───────────────────
   const root = persons.find((p) => !p.parents?.length);
 
-  const finalTreeData = root ? map[root.id] : null;
-
-  console.log("finalTreeData-------------", finalTreeData);
-
-  return finalTreeData;
+  return root ? map[root.id] : null;
 }
 
 /**
