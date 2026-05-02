@@ -27,7 +27,7 @@ const INITIAL_FORM: FormData = {
   dob: "",
   death: "",
   isMarried: false,
-  spouse: null,
+  spouse: [],
   isAlive: true,
   vanshId: "",
 };
@@ -187,7 +187,7 @@ const filteredSpouse = useMemo(() => {
       ...form,
       parents: parentId ? [parentId] : [],
       children: [],
-      spouse: spouseIds.length ? (spouseIds as []) : null,
+      spouse: spouseIds.length ? (spouseIds as []) : [],
       isApproved: false,
       childrenData: [],
       spouseData: [],

@@ -61,21 +61,34 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: Partial<IFamily> = await request.json();
-
     // ── NORMALIZE ONLY (no heavy validation) ──
-    const payload = body as IFamily; // 1:1 mapping, so we can skip heavy validation for now
-
+    const payload = {
+      ...body,
+      spouse: Array.isArray(body.spouse)
+        ? body.spouse
+        : body.spouse
+          ? [body.spouse]
+          : [],
+    };
     const newFamily = await createDoc(Family, payload);
 
     // spouse ↔ spouse
     if (payload.spouse?.length && newFamily._id) {
-      await Promise.all(
-        payload.spouse.map((spouseId) =>
-          updateDoc(Family, spouseId.toString(), {
-            spouse: [newFamily._id], // keep schema consistent
+      const spouseIds = payload.spouse.map((id) => id.toString());
+
+      await Promise.all([
+        // update spouses → add new person
+        ...spouseIds.map((id) =>
+          Family.findByIdAndUpdate(id, {
+            $addToSet: { spouse: newFamily._id }, // 🔥 no duplicates
           })
-        )
-      );
+        ),
+
+        // update new person → add spouses
+        Family.findByIdAndUpdate(newFamily._id, {
+          $addToSet: { spouse: { $each: spouseIds } },
+        }),
+      ]);
     }
 
     return NextResponse.json<ApiResponse<typeof newFamily>>(

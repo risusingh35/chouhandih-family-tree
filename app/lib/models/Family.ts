@@ -9,7 +9,7 @@ export interface IFamily extends Document {
   isMarried: boolean;
   isAlive: boolean;
   isApproved: boolean;
-  spouse: Types.ObjectId[] | null;
+  spouse: Types.ObjectId[] | [];
   parents: Types.ObjectId[];
   children: Types.ObjectId[];
   approvedBy?: Types.ObjectId | null;
@@ -63,14 +63,11 @@ const FamilySchema: Schema<IFamily> = new Schema(
       type: Boolean,
       default: false,
     },
-
-    spouse: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Family",
-      },
-    ],
-
+    spouse: {
+      type: [Schema.Types.ObjectId],
+      ref: "Family",
+      default: [],
+    },
     parents: [
       {
         type: Schema.Types.ObjectId,
@@ -78,12 +75,6 @@ const FamilySchema: Schema<IFamily> = new Schema(
       },
     ],
 
-    children: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Family",
-      },
-    ],
     vanshId: {
       type: Schema.Types.ObjectId,
       ref: "Vansh",

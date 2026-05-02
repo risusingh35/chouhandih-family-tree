@@ -39,6 +39,37 @@ const PersonNode = ({
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+  const groupedChildren = useMemo(() => {
+    const visited = new Set<string>();
+
+    return person.childrenData.reduce((acc: any[], child) => {
+      if (visited.has(child.id)) return acc;
+
+      const spouseId = child.spouse?.[0];
+      const spouse = spouseId
+        ? person.childrenData.find((c) => c.id === spouseId)
+        : null;
+
+      if (spouse && !visited.has(spouse.id)) {
+        visited.add(child.id);
+        visited.add(spouse.id);
+
+        acc.push({
+          type: "couple",
+          members: [child, spouse],
+        });
+      } else {
+        visited.add(child.id);
+
+        acc.push({
+          type: "single",
+          members: [child],
+        });
+      }
+
+      return acc;
+    }, []);
+  }, [person.childrenData]);
 
   // ─── spouse resolve ─────────────────
   const spouse = useMemo(() => {
@@ -59,7 +90,6 @@ const PersonNode = ({
     },
     [person.id, onAddParent],
   );
-  console.log("person-----------------------", person);
   const borderColor = person.gender === "F" ? "#e91e63" : "#2196f3";
 
   // ───────────────── UI ─────────────────
@@ -81,13 +111,13 @@ const PersonNode = ({
         />
 
         {/* SPOUSE */}
-        {spouse && (
+        {/* {spouse && (
           <Card
             person={spouse}
             borderColor={spouse.gender === "F" ? "#e91e63" : "#2196f3"}
             isSpouse
           />
-        )}
+        )} */}
       </div>
 
       {/* ================= CONNECTOR ================= */}
@@ -127,16 +157,45 @@ const PersonNode = ({
               flexWrap: "wrap",
             }}
           >
-            {person.childrenData.map((child) => (
-              <PersonNode
-                key={child.id}
-                person={child}
-                onAddChild={onAddChild}
-                onAddParent={onAddParent}
-                vanshId={vanshId}
-                persons={persons}
-              />
-            ))}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 30,
+                flexWrap: "wrap",
+              }}
+            >
+              {groupedChildren.map((group, i) => {
+                if (group.type === "couple") {
+                  return (
+                    <div key={i} style={{ display: "flex", gap: 10 }}>
+                      {group.members.map((member: any) => (
+                        <PersonNode
+                          key={member.id}
+                          person={member}
+                          onAddChild={onAddChild}
+                          onAddParent={onAddParent}
+                          vanshId={vanshId}
+                          persons={persons}
+                        />
+                      ))}
+                    </div>
+                  );
+                }
+
+                // single
+                return (
+                  <PersonNode
+                    key={group.members[0].id}
+                    person={group.members[0]}
+                    onAddChild={onAddChild}
+                    onAddParent={onAddParent}
+                    vanshId={vanshId}
+                    persons={persons}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

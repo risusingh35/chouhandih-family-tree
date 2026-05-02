@@ -1,8 +1,5 @@
-// utils/buildTree.ts
-
 import { saveFamily } from "../apiCallHelper/saveFamily";
 import type { ParentId, Family, PersonNode } from "../types";
-
 /**
  * Build Tree (robust version)
  */
@@ -16,12 +13,12 @@ export function buildTree(persons: Family[]): PersonNode | null {
     map[p.id] = {
       ...p,
       childrenData: [],
-      spouseData: [],
       parentData: [],
+      spouseData: [],
     };
   });
 
-  // ─── Build Parent + Children (from parents only) ───
+  // ─── Build Parent + Children ──────────
   persons.forEach((p) => {
     const node = map[p.id];
 
@@ -29,26 +26,37 @@ export function buildTree(persons: Family[]): PersonNode | null {
     node.parentData =
       p.parents?.map((id) => map[id]).filter(Boolean) || [];
 
-    // 🔥 derive children (IMPORTANT)
+    // 🔥 derive children (with duplicate protection)
     p.parents?.forEach((parentId) => {
       if (map[parentId]) {
-        map[parentId].childrenData.push(node);
+        const parent = map[parentId];
+
+        // ✅ prevent duplicate child push
+        if (!parent.childrenData.some((c) => c.id === node.id)) {
+          parent.childrenData.push(node);
+        }
       }
     });
   });
 
-  // ─── Spouse Linking (bi-directional safe) ──────────
+  // ❌ REMOVE THIS BLOCK COMPLETELY
+  /*
   persons.forEach((p) => {
     const node = map[p.id];
 
     node.spouseData =
       p.spouse?.map((id) => map[id]).filter(Boolean) || [];
   });
+  */
 
-  // ─── Root Detection ───────────────────────────────
+  // ─── Root Detection ───────────────────
   const root = persons.find((p) => !p.parents?.length);
 
-  return root ? map[root.id] : null;
+  const finalTreeData = root ? map[root.id] : null;
+
+  console.log("finalTreeData-------------", finalTreeData);
+
+  return finalTreeData;
 }
 
 /**
@@ -74,7 +82,7 @@ export async function addChildToPersons(
   persons: Family[],
   parentId: ParentId,
   child: Family
-): Promise<Family[]> {  
+): Promise<Family[]> {
 
   if (!parentId || !child?.id) return persons;
   // save data in db

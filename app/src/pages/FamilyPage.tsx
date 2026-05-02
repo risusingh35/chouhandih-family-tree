@@ -49,8 +49,10 @@ export const FamilyPage = () => {
           isAlive: f.isAlive,
           isApproved: f.isApproved,
 
-          spouse: Array.isArray(f?.spouse)
-            ? f.spouse.map((id: any) => id.toString())
+          spouse: f?.spouse
+            ? Array.isArray(f.spouse)
+              ? f.spouse.map((id: any) => id.toString())
+              : [f.spouse.toString()]
             : [],
 
           parents: Array.isArray(f?.parents)
@@ -75,7 +77,7 @@ export const FamilyPage = () => {
 
   // ─── Build Tree ─────────────────────────────────────
   const tree = useMemo(() => buildTree(persons), [persons]);
-
+  console.log("tree-----------------------", tree);
   // ─── Loading ────────────────────────────────────────
   if (loading) {
     return <div style={{ padding: 40 }}>Loading family...</div>;
