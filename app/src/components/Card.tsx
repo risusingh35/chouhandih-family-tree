@@ -4,183 +4,106 @@ import AddChildModal from "../modal/AddChildModal";
 import MalaOverlay from "./MalaOverlay";
 import GenderBadge from "./GenderBadge";
 import ActionBtn from "./ActionBtn";
+import { CardStyle, COLORS } from "../constants/colors";
+
 const DEFAULT_IMG = "/images/default.jpeg";
+// ─────────────────────────────────────────────────────────────────────────────
+const formatDate = (dateStr: string) => new Date(dateStr).toDateString();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Card
+// ─────────────────────────────────────────────────────────────────────────────
 const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
   const [childModal, setChildModal] = useState(false);
   const [parentModal, setParentModal] = useState(false);
   const [showChildren, setShowChildren] = useState(true);
-  // add child
+
   const handleChildSave = (child: Family) => {
     onAddChild(person.id, child);
     setShowChildren(true);
   };
 
-  // add parent
   const handleParentSave = useCallback(
-    (parent: Family) => {
-      onAddParent(person.id, parent);
-    },
+    (parent: Family) => onAddParent(person.id, parent),
     [person.id, onAddParent],
   );
+
   const spouse = useMemo(
     () => persons.find((p: Family) => p.id === person.spouse?.[0]),
     [person, persons],
   );
 
   const isDeceased = !person.isAlive;
-  const getFormattedDate = (dateStr: string) => {
-    const data = new Date(dateStr);
-    return data.toDateString();
-  };
+
+  const details: [string, string | number][] = [
+    ["DOB", formatDate(person.dob)],
+    ["Spouse", spouse?.name ?? "—"],
+    ["DOM", formatDate(person.dom)],
+    ["Children", person.childrenData?.length ?? 0],
+    // ["Status", isDeceased ? "Deceased" : "Alive"],
+  ];
+
   return (
-    <div
-      style={{
-        fontFamily: "'DM Sans', sans-serif",
-        padding: "14px 14px 12px",
-        borderRadius: 16,
-        background: "linear-gradient(160deg, #f5f0e8 0%, #ede6d6 100%)",
-        border: "1.5px solid #c9b97a",
-        minWidth: 160,
-        maxWidth: 200,
-        cursor: "pointer",
-        boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-        transition: "box-shadow 0.2s, transform 0.2s",
-        position: "relative",
-      }}
-    >
-      {/* PHOTO + BADGES */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: 20,
-        }}
-      >
-        <div style={{ position: "relative", width: 72, height: 72 }}>
+    <div style={CardStyle.card}>
+      {/* ── Photo ─────────────────────────────────────────────────────── */}
+      <div style={CardStyle.photoWrapper}>
+        <div style={CardStyle.photoInner}>
           <img
             src={person.photo || DEFAULT_IMG}
             alt={person.name}
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: "50%",
-              objectFit: "cover",
-              display: "block",
-              filter: "grayscale(60%) brightness(0.88)",
-              border: "2.5px solid #b8972a",
-              transition: "filter 0.2s, border 0.2s",
-            }}
+            style={CardStyle.photo}
           />
-
-          {/* Mala overlay for deceased */}
           {isDeceased && <MalaOverlay />}
-
-          {/* Gender badge — bottom-right of the circle */}
           <GenderBadge gender={person.gender} />
         </div>
       </div>
-      {/* NAME */}
-      <div
-        style={{
-          textAlign: "center",
-          fontWeight: 700,
-          fontSize: 14,
-          color: "#78350f",
-          letterSpacing: "-0.01em",
-          lineHeight: 1.3,
-          marginBottom: 4,
-        }}
-      >
-        {person.name}
-      </div>
-      {/* DOB subtitle always visible */}
-      {person.dob && (
-        <div
-          style={{
-            textAlign: "center",
-            fontSize: 11,
-            color: "#94a3b8",
-            marginBottom: 6,
-          }}
-        >
-          DOB: {getFormattedDate(person.dob)}
-        </div>
-      )}
-      {/* DETAILS (expanded) */}
-      {
-        <>
-          <div
-            style={{
-              background: "rgba(180,150,60,0.08)",
-              borderRadius: 10,
-              padding: "8px 10px",
-              marginBottom: 10,
-            }}
-          >
-            {[
-              ["Spouse", spouse?.name || "—"],
-              ["Children", person.childrenData?.length || 0],
-              ["Status", person.isAlive ? "Alive" : "Deceased"],
-            ].map(([label, value]) => (
-              <div
-                key={label as string}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "3px 0",
-                  borderBottom: "1px solid rgba(0,0,0,0.05)",
-                  fontSize: 12,
-                  color: "#475569",
-                }}
-              >
-                <span style={{ color: "#94a3b8", fontWeight: 500 }}>
-                  {label}
-                </span>
-                <span
-                  style={{
-                    fontWeight: 600,
-                    color: "#b45309",
-                  }}
-                >
-                  {value}
-                </span>
-              </div>
-            ))}
-          </div>
 
-          {/* ACTION BUTTONS */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            <ActionBtn
-              onClick={(e) => {
-                e.stopPropagation();
-                setChildModal(true);
-              }}
-              icon="＋"
-              label="Add Child"
-            />
-            <ActionBtn
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowChildren((v) => !v);
-              }}
-              icon="↑"
-              label="Add Parent"
-            />
-            {
-              <ActionBtn
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                icon="⇄"
-                label="Toggle Children"
-                variant="muted"
-              />
-            }
+      {/* ── Name ──────────────────────────────────────────────────────── */}
+      <div style={CardStyle.name}>{person.name}</div>
+
+      {/* ── Details ───────────────────────────────────────────────────── */}
+      <div style={CardStyle.detailsBox}>
+        {details.map(([label, value]) => (
+          <div key={label} style={CardStyle.detailRow}>
+            <span style={CardStyle.detailLabel}>{label}</span>
+            <span style={CardStyle.detailValue}>{value}</span>
           </div>
-        </>
-      }
-      {/* MODALS */}
+        ))}
+      </div>
+      {/* ── DOM ───────────────────────────────────────────────────────── */}
+      {person.dod && (
+        <div style={CardStyle.date}>DOD: {formatDate(person.dod)}</div>
+      )}
+      {/* ── Actions ───────────────────────────────────────────────────── */}
+      <div style={CardStyle.actionGroup}>
+        <ActionBtn
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            setChildModal(true);
+          }}
+          icon="＋"
+          label="Add Child"
+        />
+        <ActionBtn
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            setParentModal(true);
+          }}
+          icon="↑"
+          label="Add Parent"
+        />
+        <ActionBtn
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            setShowChildren((v) => !v);
+          }}
+          icon="⇄"
+          label="Toggle Children"
+          variant="muted"
+        />
+      </div>
+
+      {/* ── Modals ────────────────────────────────────────────────────── */}
       <AddChildModal
         isOpen={childModal}
         onClose={() => setChildModal(false)}
@@ -188,7 +111,7 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
         onSave={handleChildSave}
         vanshId={vanshId}
         persons={persons}
-      />{" "}
+      />
       <AddChildModal
         isOpen={parentModal}
         onClose={() => setParentModal(false)}
@@ -200,4 +123,5 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
     </div>
   );
 };
+
 export default Card;
