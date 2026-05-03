@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Family, IFamily } from "../../lib/models/Family";
-import { createDoc, getDocs, updateDoc } from "../../lib/crud";
+import { createDoc, getDocs } from "../../lib/crud";
 import type { ApiResponse } from "../../lib/type/api";
 import { Types } from "mongoose";
 

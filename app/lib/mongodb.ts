@@ -1,19 +1,11 @@
 import "server-only";
 import mongoose, { Mongoose } from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable in .env.local"
-  );
-}
-
 interface MongooseCache {
   conn: Mongoose | null;
   promise: Promise<Mongoose> | null;
 }
 
-// Extend NodeJS global to persist cache across hot reloads in dev
 declare global {
   // eslint-disable-next-line no-var
   var mongoose: MongooseCache | undefined;
@@ -25,10 +17,20 @@ if (!global.mongoose) {
   global.mongoose = cached;
 }
 
+const getMongoUri = () => {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("MONGODB_URI is not defined");
+  }
+  return uri;
+};
+
 async function connectDB(): Promise<Mongoose> {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
+    const uri = getMongoUri(); // ✅ moved here
+
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       maxPoolSize: 10,
@@ -38,7 +40,7 @@ async function connectDB(): Promise<Mongoose> {
     };
 
     cached.promise = mongoose
-      .connect(MONGODB_URI, opts)
+      .connect(uri, opts)
       .then((m) => {
         console.log("✅ MongoDB connected");
         return m;
@@ -49,13 +51,7 @@ async function connectDB(): Promise<Mongoose> {
       });
   }
 
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
+  cached.conn = await cached.promise;
   return cached.conn;
 }
 
