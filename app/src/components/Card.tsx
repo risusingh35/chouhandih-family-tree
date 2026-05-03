@@ -8,7 +8,8 @@ import { CardStyle, COLORS } from "../constants/colors";
 
 const DEFAULT_IMG = "/images/default.jpeg";
 // ─────────────────────────────────────────────────────────────────────────────
-const formatDate = (dateStr: string) => new Date(dateStr).toDateString();
+const formatDate = (dateStr: string) =>
+  dateStr ? new Date(dateStr).toDateString() : "";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Card
@@ -72,7 +73,7 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
       </div>
       {/* ── DOM ───────────────────────────────────────────────────────── */}
       {person.dod && (
-        <div style={CardStyle.date}>DOD: {formatDate(person.dod)}</div>
+        <div style={CardStyle.date}>DOD: {formatDate(person.dom)}</div>
       )}
       {/* ── Actions ───────────────────────────────────────────────────── */}
       <div style={CardStyle.actionGroup}>

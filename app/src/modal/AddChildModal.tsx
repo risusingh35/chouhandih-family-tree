@@ -18,9 +18,12 @@ import type {
 } from "../types";
 import "../../globals.css";
 
-// ─────────────────── constants ───────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────────────────────────────────────
 
 const DEFAULT_PHOTO = "/images/default.jpeg";
+const TODAY = new Date().toISOString().split("T")[0];
 
 const INITIAL_FORM: FormData = {
   name: "",
@@ -35,38 +38,35 @@ const INITIAL_FORM: FormData = {
   vanshId: "",
 };
 
-const TODAY = new Date().toISOString().split("T")[0];
-
-// ─────────────────── validation ───────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Validation
+// ─────────────────────────────────────────────────────────────────────────────
 
 const validate = (form: FormData): FormErrors => {
   const errors: FormErrors = {};
-
   if (!form.name.trim()) errors.name = "Full name is required.";
   if (!form.dob) errors.dob = "Date of birth is required.";
-
   if (!form.isAlive) {
-    if (!form.dod) {
-      errors.dod = "Date of Death is required when deceased.";
-    } else if (form.dob && form.dod < form.dob) {
-      errors.dod = "Date of Death cannot be before date of birth.";
-    }
+    if (!form.dod) errors.dod = "Date of dod is required when deceased.";
+    else if (form.dob && form.dod < form.dob)
+      errors.dod = "Date of dod cannot be before date of birth.";
   }
-
   return errors;
 };
 
-// ─────────────────── Field ───────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Sub-component: Field
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface FieldProps {
   label: string;
   required?: boolean;
   error?: string;
-  children: React.ReactNode;
   htmlFor?: string;
+  children: React.ReactNode;
 }
 
-const Field = ({ label, required, error, children, htmlFor }: FieldProps) => (
+const Field = ({ label, required, error, htmlFor, children }: FieldProps) => (
   <div className="acm-field">
     <label
       htmlFor={htmlFor}
@@ -75,9 +75,7 @@ const Field = ({ label, required, error, children, htmlFor }: FieldProps) => (
       {label}
       {required && <span className="acm-required">*</span>}
     </label>
-
     {children}
-
     {error && (
       <span role="alert" className="acm-error">
         {error}
@@ -86,25 +84,93 @@ const Field = ({ label, required, error, children, htmlFor }: FieldProps) => (
   </div>
 );
 
-// ─────────────────── StatusToggle ───────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Sub-component: VitalStatusRadio
+//    Replaces the toggle — two pill-style radio buttons: Alive / Deceased
+// ─────────────────────────────────────────────────────────────────────────────
 
-interface StatusToggleProps {
-  checked: boolean;
+interface VitalStatusRadioProps {
+  value: boolean; // true = alive
   onChange: (val: boolean) => void;
-  labelOn: string;
-  labelOff: string;
-  colorOn?: string; // active bg
-  colorOff?: string; // inactive bg
 }
 
-const StatusToggle = ({
-  checked,
-  onChange,
-  labelOn,
-  labelOff,
-  colorOn = "#22c55e",
-  colorOff = "#94a3b8",
-}: StatusToggleProps) => (
+const VitalStatusRadio = ({ value, onChange }: VitalStatusRadioProps) => {
+  const options = [
+    {
+      label: "Alive",
+      val: true,
+      activeColor: "#22c55e",
+      activeBg: "#f0fdf4",
+      activeBorder: "#86efac",
+    },
+    {
+      label: "Deceased",
+      val: false,
+      activeColor: "#ef4444",
+      activeBg: "#fef2f2",
+      activeBorder: "#fca5a5",
+    },
+  ] as const;
+
+  return (
+    <div style={{ display: "flex", gap: 8 }}>
+      {options.map((opt) => {
+        const active = value === opt.val;
+        return (
+          <label
+            key={opt.label}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 14px",
+              borderRadius: 20,
+              border: `1.5px solid ${active ? opt.activeBorder : "#e2e8f0"}`,
+              background: active ? opt.activeBg : "#f8fafc",
+              cursor: "pointer",
+              fontSize: 13,
+              fontWeight: active ? 600 : 400,
+              color: active ? opt.activeColor : "#94a3b8",
+              transition: "all 0.18s",
+              userSelect: "none",
+            }}
+          >
+            <input
+              type="radio"
+              name="isAlive"
+              checked={active}
+              onChange={() => onChange(opt.val)}
+              style={{ display: "none" }}
+            />
+            {/* dot indicator */}
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: active ? opt.activeColor : "#cbd5e1",
+                flexShrink: 0,
+                transition: "background 0.18s",
+              }}
+            />
+            {opt.label}
+          </label>
+        );
+      })}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Sub-component: MarriedToggle
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface MarriedToggleProps {
+  checked: boolean;
+  onChange: (val: boolean) => void;
+}
+
+const MarriedToggle = ({ checked, onChange }: MarriedToggleProps) => (
   <button
     type="button"
     role="switch"
@@ -120,7 +186,6 @@ const StatusToggle = ({
       cursor: "pointer",
     }}
   >
-    {/* track */}
     <span
       style={{
         position: "relative",
@@ -128,12 +193,11 @@ const StatusToggle = ({
         width: 44,
         height: 24,
         borderRadius: 999,
-        background: checked ? colorOn : colorOff,
+        background: checked ? "#6366f1" : "#94a3b8",
         transition: "background 0.25s",
         flexShrink: 0,
       }}
     >
-      {/* thumb */}
       <span
         style={{
           position: "absolute",
@@ -148,44 +212,49 @@ const StatusToggle = ({
         }}
       />
     </span>
-
-    {/* label */}
     <span
       style={{
         fontSize: 13,
         fontWeight: 600,
-        color: checked ? colorOn : "#94a3b8",
+        color: checked ? "#6366f1" : "#94a3b8",
         fontFamily: "'DM Sans', sans-serif",
         transition: "color 0.2s",
         userSelect: "none",
       }}
     >
-      {checked ? labelOn : labelOff}
+      {checked ? "Married" : "Unmarried"}
     </span>
   </button>
 );
 
-// ─────────────────── SectionCard ───────────────────
-// A card that holds a toggle in its header + optional expanded content below
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Sub-component: SectionCard
+//    Collapsible card — header row + optional expanded body
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface SectionCardProps {
   label: string;
-  toggle: React.ReactNode;
-  active: boolean; // whether the expandable area is open
+  control: React.ReactNode; // toggle / radio sits in the header
+  active: boolean;
   children?: React.ReactNode;
 }
 
-const SectionCard = ({ label, toggle, active, children }: SectionCardProps) => (
+const SectionCard = ({
+  label,
+  control,
+  active,
+  children,
+}: SectionCardProps) => (
   <div
     style={{
       borderRadius: 12,
       border: `1.5px solid ${active ? "#cbd5e1" : "#e2e8f0"}`,
       background: active ? "#f8fafc" : "#fff",
-      overflow: "hidden",
+      overflow: "visible", // ← must NOT be hidden; lets the dropdown escape
       transition: "border-color 0.2s, background 0.2s",
     }}
   >
-    {/* header row */}
+    {/* header */}
     <div
       style={{
         display: "flex",
@@ -205,10 +274,10 @@ const SectionCard = ({ label, toggle, active, children }: SectionCardProps) => (
       >
         {label}
       </span>
-      {toggle}
+      {control}
     </div>
 
-    {/* expanded content */}
+    {/* body */}
     {active && children && (
       <div
         style={{
@@ -217,6 +286,7 @@ const SectionCard = ({ label, toggle, active, children }: SectionCardProps) => (
           display: "flex",
           flexDirection: "column",
           gap: 10,
+          position: "relative", // stacking context for children
         }}
       >
         {children}
@@ -225,7 +295,187 @@ const SectionCard = ({ label, toggle, active, children }: SectionCardProps) => (
   </div>
 );
 
-// ─────────────────── AddChildModal ───────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Sub-component: PhotoPreview
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface PhotoPreviewProps {
+  url: string;
+  onChange: (url: string) => void;
+}
+
+const PhotoPreview = ({ url, onChange }: PhotoPreviewProps) => {
+  const [imgError, setImgError] = useState(false);
+
+  // reset error when url changes
+  useEffect(() => setImgError(false), [url]);
+
+  return (
+    <div className="acm-photo-row">
+      <div className="acm-avatar">
+        {!imgError && url ? (
+          <img src={url} alt="Preview" onError={() => setImgError(true)} />
+        ) : (
+          <span>👤</span>
+        )}
+      </div>
+      <Field label="Photo URL">
+        <input
+          name="photo"
+          value={url}
+          onChange={(e) => onChange(e.target.value)}
+          className="acm-input"
+          placeholder="https://…"
+        />
+      </Field>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Sub-component: GenderPicker
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface GenderPickerProps {
+  value: "M" | "F";
+  onChange: (g: "M" | "F") => void;
+}
+
+const GenderPicker = ({ value, onChange }: GenderPickerProps) => (
+  <Field label="Gender">
+    <div className="acm-row">
+      {(["M", "F"] as const).map((g) => (
+        <label key={g} className="acm-toggle-pill">
+          <input
+            type="radio"
+            name="gender"
+            value={g}
+            checked={value === g}
+            onChange={() => onChange(g)}
+          />
+          <span className="acm-pill">{g === "M" ? "♂ Male" : "♀ Female"}</span>
+        </label>
+      ))}
+    </div>
+  </Field>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Sub-component: SpouseDropdown
+//    FIX: dropdown list uses position:fixed so it is never clipped by any
+//         parent with overflow:hidden or a stacking-context boundary.
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface SpouseDropdownProps {
+  query: string;
+  onQueryChange: (q: string) => void;
+  results: Family[];
+  selected: Family | null;
+  onSelect: (p: Family) => void;
+  onClear: () => void;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  anchorRef: React.RefObject<HTMLDivElement | null>;
+}
+
+const SpouseDropdown = ({
+  query,
+  onQueryChange,
+  results,
+  selected,
+  onSelect,
+  onClear,
+  isOpen,
+  onOpen,
+  onClose,
+  anchorRef,
+}: SpouseDropdownProps) => {
+  // Measure anchor position so the fixed list aligns under the input
+  const [rect, setRect] = useState<DOMRect | null>(null);
+
+  useEffect(() => {
+    if (isOpen && anchorRef.current) {
+      setRect(anchorRef.current.getBoundingClientRect());
+    }
+  }, [isOpen, anchorRef]);
+
+  return (
+    <div ref={anchorRef} style={{ position: "relative" }}>
+      <input
+        className="acm-input"
+        placeholder="Search spouse by name…"
+        value={query}
+        onChange={(e) => onQueryChange(e.target.value)}
+        onFocus={onOpen}
+      />
+
+      {/* ── Fixed-position dropdown list — never hidden by parent overflow ── */}
+      {isOpen && rect && (
+        <div
+          className="acm-dropdown-list"
+          style={{
+            position: "fixed",
+            top: rect.bottom,
+            left: 10,
+            width: rect.width,
+            zIndex: 9999, // always on top
+            maxHeight: 220,
+            overflowY: "auto",
+            background: "#fff",
+            border: "1px solid #e2e8f0",
+            borderRadius: 10,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          }}
+        >
+          {results.length === 0 ? (
+            <div className="acm-dropdown-empty">No results found</div>
+          ) : (
+            results.map((p) => (
+              <div
+                key={p.id}
+                className={`acm-dropdown-item ${
+                  selected?.id === p.id ? "selected" : ""
+                }`}
+                onMouseDown={(e) => {
+                  // onMouseDown (not onClick) prevents the blur from firing first
+                  e.preventDefault();
+                  onSelect(p);
+                  onClose();
+                }}
+              >
+                <img
+                  src={p.photo || DEFAULT_PHOTO}
+                  className="acm-avatar-sm"
+                  alt={p.name}
+                />
+                <div className="acm-flex-col">
+                  <span>{p.name}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* selected chip */}
+      {selected && (
+        <div className="acm-selected">
+          <span>
+            Selected: <strong>{selected.name}</strong>
+          </span>
+          <button type="button" aria-label="Clear spouse" onClick={onClear}>
+            ✕
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ── Main: AddChildModal
+// ─────────────────────────────────────────────────────────────────────────────
 
 const AddChildModal = ({
   isOpen,
@@ -238,138 +488,118 @@ const AddChildModal = ({
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
-  const [photoError, setPhotoError] = useState(false);
 
-  // spouse search
   const [spouseQuery, setSpouseQuery] = useState("");
   const [selectedSpouse, setSelectedSpouse] = useState<Family | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownAnchorRef = useRef<HTMLDivElement>(null);
   const formId = useId();
 
-  // ── derived flags ──
-  // Spouse UI is only relevant when person is male AND married
-  const showSpouseSection = form.isMarried && form.gender === "M";
+  const showSpouseSection = form.isMarried;
 
-  // ─── effects ───
-
+  // ── Reset on open ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
-
-    const timer = setTimeout(() => nameInputRef.current?.focus(), 60);
-
+    const t = setTimeout(() => nameInputRef.current?.focus(), 60);
     setForm(INITIAL_FORM);
     setErrors({});
     setTouched(new Set());
-    setPhotoError(false);
     setSelectedSpouse(null);
     setSpouseQuery("");
     setDropdownOpen(false);
-
-    return () => clearTimeout(timer);
+    return () => clearTimeout(t);
   }, [isOpen]);
 
-  // clear dod date when toggled back to alive
+  // ── Clear dod date when toggled back to alive ────────────────────────────
   useEffect(() => {
-    if (form.isAlive) {
-      setForm((prev) => (prev.dod ? { ...prev, dod: "" } : prev));
-    }
+    if (form.isAlive) setForm((p) => (p.dod ? { ...p, dod: "" } : p));
   }, [form.isAlive]);
 
-  // clear spouse + dom when spouse section becomes hidden
+  // ── Clear spouse data when section hides ──────────────────────────────────
   useEffect(() => {
     if (!showSpouseSection) {
       setSelectedSpouse(null);
       setSpouseQuery("");
       setDropdownOpen(false);
-      setForm((prev) => ({ ...prev, spouse: [], dom: "" }));
+      setForm((p) => ({ ...p, spouse: [], dom: "" }));
     }
   }, [showSpouseSection]);
 
-  // live validation after first touch
+  // ── Live validation ────────────────────────────────────────────────────────
   useEffect(() => {
     if (touched.size) setErrors(validate(form));
   }, [form, touched]);
 
-  // close dropdown on outside click
+  // ── Close dropdown on outside click ───────────────────────────────────────
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (!dropdownRef.current?.contains(e.target as Node)) {
+      if (!dropdownAnchorRef.current?.contains(e.target as Node))
         setDropdownOpen(false);
-      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ─── handlers ───
-
+  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { name, value, type } = e.target;
       const checked = (e.target as HTMLInputElement).checked;
-      setForm((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
+      setForm((p) => ({ ...p, [name]: type === "checkbox" ? checked : value }));
     },
     [],
   );
 
   const markTouched = useCallback(
-    (name: string) => setTouched((prev) => new Set(prev).add(name)),
+    (name: string) => setTouched((p) => new Set(p).add(name)),
     [],
   );
 
-  // ─── memo ───
+  const filteredSpouses = useMemo(
+    () =>
+      persons
+        .filter((p) => p.name !== "Chouhandih")
+        .filter((p) => p.gender !== form.gender)
+        .filter((p) => (p?.spouse?.length || 0) < 1)
+        .filter((p) =>
+          p.name.toLowerCase().includes(spouseQuery.toLowerCase()),
+        ),
+    [spouseQuery, persons],
+  );
 
-  const filteredSpouses = useMemo(() => {
-    // only show females (opposite of male person)
-    return persons
-      .filter((p) => p.gender === "F")
-      .filter((p) => p.name.toLowerCase().includes(spouseQuery.toLowerCase()));
-  }, [spouseQuery, persons]);
-
-  // ─── save ───
-
+  // ── Save ──────────────────────────────────────────────────────────────────
   const handleSave = () => {
-    // mark all key fields touched so errors surface
     setTouched(new Set(["name", "dob", "dod"]));
-
     const errs = validate(form);
     setErrors(errs);
     if (Object.keys(errs).length) return;
-
-    const spouseIds = selectedSpouse ? [selectedSpouse.id] : [];
 
     const newChild: ChildNode = {
       id: uuidv4(),
       ...form,
       parents: parentId ? [parentId] : [],
       children: [],
-      spouse: spouseIds.length ? (spouseIds as []) : [],
+      spouse: selectedSpouse ? [selectedSpouse.id] : [],
       isApproved: false,
       childrenData: [],
       spouseData: [],
       vanshId,
     };
-
     onSave(newChild);
     onClose();
   };
-
-  // ─── render ───
 
   if (!isOpen) return null;
 
   const hasErrors = Object.keys(errors).length > 0;
 
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="acm-backdrop">
       <div className="acm-panel">
-        {/* HEADER */}
+        {/* Header */}
         <div className="acm-header">
           <h2>Add New Member</h2>
           <button onClick={onClose} aria-label="Close">
@@ -378,35 +608,13 @@ const AddChildModal = ({
         </div>
 
         <div className="acm-body">
-          {/* PHOTO */}
-          <div className="acm-photo-row">
-            <div className="acm-avatar">
-              {!photoError && form.photo ? (
-                <img
-                  src={form.photo}
-                  alt="Preview"
-                  onError={() => setPhotoError(true)}
-                />
-              ) : (
-                <span>👤</span>
-              )}
-            </div>
+          {/* Photo */}
+          <PhotoPreview
+            url={form.photo}
+            onChange={(url) => setForm((p) => ({ ...p, photo: url }))}
+          />
 
-            <Field label="Photo URL">
-              <input
-                name="photo"
-                value={form.photo}
-                onChange={(e) => {
-                  setPhotoError(false);
-                  handleChange(e);
-                }}
-                className="acm-input"
-                placeholder="https://…"
-              />
-            </Field>
-          </div>
-
-          {/* NAME */}
+          {/* Full name */}
           <Field
             label="Full Name"
             required
@@ -424,7 +632,39 @@ const AddChildModal = ({
               placeholder="Enter full name"
             />
           </Field>
-          {/* DOB */}
+
+          {/* ── Vital Status — radio buttons ── */}
+          <SectionCard
+            label="Vital Status"
+            control={
+              <VitalStatusRadio
+                value={form.isAlive}
+                onChange={(val) => setForm((p) => ({ ...p, isAlive: val }))}
+              />
+            }
+            active={!form.isAlive}
+          >
+            <Field
+              label="Date of Death"
+              required
+              error={touched.has("dod") ? errors.dod : undefined}
+              htmlFor={`${formId}-dod`}
+            >
+              <input
+                id={`${formId}-dod`}
+                name="dod"
+                value={form.dod}
+                onChange={handleChange}
+                onBlur={() => markTouched("dod")}
+                type="date"
+                min={form.dob || undefined}
+                max={TODAY}
+                className="acm-input"
+              />
+            </Field>
+          </SectionCard>
+
+          {/* Date of birth */}
           <Field
             label="Date of Birth"
             required
@@ -443,87 +683,29 @@ const AddChildModal = ({
             />
           </Field>
 
-          {/* GENDER */}
-          <Field label="Gender">
-            <div className="acm-row">
-              {(["M", "F"] as const).map((g) => (
-                <label key={g} className="acm-toggle-pill">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value={g}
-                    checked={form.gender === g}
-                    onChange={handleChange}
-                  />
-                  <span className="acm-pill">
-                    {g === "M" ? "♂ Male" : "♀ Female"}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </Field>
-          {/* ── VITAL STATUS GROUP ── */}
-          <SectionCard
-            toggle={
-              <StatusToggle
-                checked={form.isAlive}
-                onChange={(val) =>
-                  setForm((prev) => ({ ...prev, isAlive: val }))
-                }
-                labelOn="Alive"
-                labelOff="Deceased"
-                colorOn="#22c55e"
-                colorOff="#ef4444"
-              />
-            }
-            label="Vital Status"
-            active={!form.isAlive}
-          >
-            {/* Date of Death — visible only when deceased */}
-            {!form.isAlive && (
-              <Field
-                label="Date of Death"
-                required
-                error={touched.has("dod") ? errors.dod : undefined}
-                htmlFor={`${formId}-dod`}
-              >
-                <input
-                  id={`${formId}-dod`}
-                  name="dod"
-                  value={form.dod}
-                  onChange={handleChange}
-                  onBlur={() => markTouched("dod")}
-                  type="date"
-                  min={form.dob || undefined}
-                  max={TODAY}
-                  className="acm-input"
-                />
-              </Field>
-            )}
-          </SectionCard>
+          {/* Gender */}
+          <GenderPicker
+            value={form.gender}
+            onChange={(g) => setForm((p) => ({ ...p, gender: g }))}
+          />
 
-          {/* ── MARITAL STATUS GROUP ── */}
+          {/* ── Marital Status ── */}
           <SectionCard
-            toggle={
-              <StatusToggle
+            label="Marital Status"
+            control={
+              <MarriedToggle
                 checked={form.isMarried}
                 onChange={(val) =>
-                  setForm((prev) => ({
-                    ...prev,
+                  setForm((p) => ({
+                    ...p,
                     isMarried: val,
-                    spouse: val ? prev.spouse : [],
+                    spouse: val ? p.spouse : [],
                   }))
                 }
-                labelOn="Married"
-                labelOff="Unmarried"
-                colorOn="#6366f1"
-                colorOff="#94a3b8"
               />
             }
-            label="Marital Status"
             active={form.isMarried}
           >
-            {/* Marriage date + spouse — only when married male */}
             {showSpouseSection && (
               <>
                 <Field label="Marriage Date" htmlFor={`${formId}-dom`}>
@@ -540,79 +722,33 @@ const AddChildModal = ({
                 </Field>
 
                 <Field label="Spouse">
-                  <div className="acm-dropdown" ref={dropdownRef}>
-                    <input
-                      className="acm-input"
-                      placeholder="Search spouse by name…"
-                      value={spouseQuery}
-                      onChange={(e) => setSpouseQuery(e.target.value)}
-                      onFocus={() => setDropdownOpen(true)}
-                    />
-
-                    {dropdownOpen && (
-                      <div className="acm-dropdown-list">
-                        {filteredSpouses.length === 0 ? (
-                          <div className="acm-dropdown-empty">
-                            No results found
-                          </div>
-                        ) : (
-                          filteredSpouses.map((p) => (
-                            <div
-                              key={p.id}
-                              className={`acm-dropdown-item ${
-                                selectedSpouse?.id === p.id ? "selected" : ""
-                              }`}
-                              onClick={() => {
-                                setSelectedSpouse(p);
-                                setSpouseQuery(p.name);
-                                setDropdownOpen(false);
-                                setForm((prev) => ({
-                                  ...prev,
-                                  spouse: [p.id],
-                                }));
-                              }}
-                            >
-                              <img
-                                src={p.photo || DEFAULT_PHOTO}
-                                className="acm-avatar-sm"
-                                alt={p.name}
-                              />
-                              <div className="acm-flex-col">
-                                <span>{p.name}</span>
-                                <span className="acm-muted">Female</span>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
-
-                    {selectedSpouse && (
-                      <div className="acm-selected">
-                        <span>
-                          Selected: <strong>{selectedSpouse.name}</strong>
-                        </span>
-                        <button
-                          type="button"
-                          aria-label="Clear spouse"
-                          onClick={() => {
-                            setSelectedSpouse(null);
-                            setSpouseQuery("");
-                            setForm((prev) => ({ ...prev, spouse: [] }));
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <SpouseDropdown
+                    query={spouseQuery}
+                    onQueryChange={setSpouseQuery}
+                    results={filteredSpouses}
+                    selected={selectedSpouse}
+                    onSelect={(p) => {
+                      setSelectedSpouse(p);
+                      setSpouseQuery(p.name);
+                      setForm((prev) => ({ ...prev, spouse: [p.id] }));
+                    }}
+                    onClear={() => {
+                      setSelectedSpouse(null);
+                      setSpouseQuery("");
+                      setForm((p) => ({ ...p, spouse: [] }));
+                    }}
+                    isOpen={dropdownOpen}
+                    onOpen={() => setDropdownOpen(true)}
+                    onClose={() => setDropdownOpen(false)}
+                    anchorRef={dropdownAnchorRef}
+                  />
                 </Field>
               </>
             )}
           </SectionCard>
         </div>
 
-        {/* FOOTER */}
+        {/* Footer */}
         <div className="acm-footer">
           <button className="acm-btn-cancel" onClick={onClose}>
             Cancel
