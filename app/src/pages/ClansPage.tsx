@@ -1,121 +1,11 @@
 "use client";
 import { COLORS } from "../constants/colors";
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import type { Clan, Group, VanshName, Vansh } from "../types";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import type { Group, VanshName } from "../types";
+import { ClanCard } from "../components/ClanCard";
+import { Loader } from "../components/ui/Loader";
 
-// ─── Vansh Badge ─────────────────────────────────────────────────────────
-const VanshBadge = ({ vansh }: { vansh?: Vansh }) => {
-  if (!vansh) return null;
-  return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        padding: "3px 9px",
-        borderRadius: 20,
-        fontSize: 10,
-        fontWeight: 700,
-        background: vansh.color?.bg,
-        color: vansh.color?.text,
-        border: `1px solid ${vansh.color?.border}`,
-      }}
-    >
-      {vansh.name === "Agnivanshi" && "🔥 "}
-      {vansh.name === "Chandravanshi" && "🌙 "}
-      {vansh.name === "Suryavanshi" && "☀️ "}
-      {vansh.name}
-    </span>
-  );
-};
-
-// ─── Clan Card ────────────────────────────────────────────────────────────
-const ClanCard = ({ clan }: { clan: Clan }) => {
-  const router = useRouter();
-  const [hovered, setHovered] = useState(false);
-  if (!clan) return null;
-  return (
-    <button
-      onClick={() => router.push(`/family?vanshId=${clan?.vansh?._id}`)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        all: "unset",
-        cursor: "pointer",
-        borderRadius: 18,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        border: `1.5px solid ${hovered ? clan.accent + "55" : COLORS.sand}`,
-        background: hovered
-          ? `linear-gradient(160deg, #fffdf8 0%, #fdf6ec 100%)`
-          : COLORS.cream,
-        boxShadow: hovered
-          ? `0 16px 40px rgba(44,31,14,0.13)`
-          : "0 2px 8px rgba(44,31,14,0.05)",
-        transform: hovered ? "translateY(-4px)" : "none",
-        transition: "all 0.22s",
-      }}
-    >
-      <div
-        style={{
-          height: 4,
-          background: clan.accent,
-          opacity: hovered ? 1 : 0.6,
-        }}
-      />
-
-      <div
-        style={{
-          padding: 20,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>
-            <h3 style={{ margin: 0, color: COLORS.bark }}>{clan.name}</h3>
-            <small style={{ color: COLORS.muted }}>{clan.altName}</small>
-          </div>
-          <VanshBadge vansh={clan.vansh} />
-        </div>
-
-        <p style={{ fontSize: 13, color: "#5a4a38" }}>{clan.description}</p>
-
-        <div style={{ fontSize: 12, color: COLORS.muted }}>
-          📍 {clan.origin}
-        </div>
-        <div style={{ fontSize: 12, color: COLORS.muted }}>
-          🙏 Kuldevi: {clan.kuldevi}
-        </div>
-
-        {clan.subclans?.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-            {clan.subclans.map((s) => (
-              <span
-                key={s}
-                style={{
-                  padding: "2px 8px",
-                  borderRadius: 20,
-                  background: COLORS.warm100,
-                  border: `1px solid ${COLORS.warm300}`,
-                  fontSize: 10,
-                  color: COLORS.umber,
-                }}
-              >
-                {s}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-    </button>
-  );
-};
-
-// ─── Filters ──────────────────────────────────────────────────────────────
 const VANSH_OPTIONS: ("All" | VanshName)[] = [
   "All",
   "Agnivanshi",
@@ -126,26 +16,30 @@ const VANSH_OPTIONS: ("All" | VanshName)[] = [
 // ─── Main Page ────────────────────────────────────────────────────────────
 export const ClansPage = () => {
   const searchParams = useSearchParams();
-  const groupId = searchParams.get("groupId");
-
   const [group, setGroup] = useState<Group | null>(null);
   const [loading, setLoading] = useState(true);
-
   const [search, setSearch] = useState("");
   const [vanshFilter, setVanshFilter] = useState<"All" | VanshName>("All");
+  const hasFetched = useRef(false);
 
-  // ─── Fetch ──────────────────────────────────────────────────────────────
+  const rawGroupId = searchParams.get("groupId");
+  const [groupId, setGroupId] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!groupId) return;
+    if (rawGroupId) {
+      setGroupId(rawGroupId);
+    }
+  }, [rawGroupId]);
 
-    let mounted = true;
+  useEffect(() => {
+    if (!groupId || hasFetched.current) return;
+
+    hasFetched.current = true;
 
     const fetchData = async () => {
       setLoading(true);
       const res = await fetch(`/api/clan?groupId=${groupId}`);
       const json = await res.json();
-
-      if (!mounted) return;
 
       setGroup({
         id: groupId,
@@ -158,10 +52,6 @@ export const ClansPage = () => {
     };
 
     fetchData();
-
-    return () => {
-      mounted = false;
-    };
   }, [groupId]);
 
   // ─── Filter Logic ───────────────────────────────────────────────────────
@@ -178,7 +68,7 @@ export const ClansPage = () => {
     });
   }, [group, search, vanshFilter]);
 
-  if (loading || !group) return <div style={{ padding: 40 }}>Loading...</div>;
+  if (loading || !group) return  <Loader />;
 
   // ─── UI ─────────────────────────────────────────────────────────────────
   return (

@@ -6,6 +6,7 @@ import { COLORS } from "../constants/colors";
 import Ornament from "../components/ui/Ornament";
 import { Footer } from "../components/ui/Footer";
 import type { IGroup } from "../types";
+import Loader from "../components/ui/Loader";
 
 const GroupPage = () => {
   const [group, setGroup] = useState<IGroup | null>(null);
@@ -27,7 +28,7 @@ const GroupPage = () => {
   };
 }, []);
 
-  if (!group) return null;
+  if (!group) return <Loader /> ;
 
   return (
     <div
