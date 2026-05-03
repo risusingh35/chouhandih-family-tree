@@ -376,7 +376,7 @@ interface SpouseDropdownProps {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  anchorRef: React.RefObject<HTMLDivElement | null>;
+  anchorRef: React.RefObject<HTMLDivElement>;
 }
 
 const SpouseDropdown = ({
@@ -416,8 +416,8 @@ const SpouseDropdown = ({
           className="acm-dropdown-list"
           style={{
             position: "fixed",
-            top: rect.bottom,
-            left: 10,
+            top: rect.bottom + 4,
+            left: rect.left,
             width: rect.width,
             zIndex: 9999, // always on top
             maxHeight: 220,
@@ -451,6 +451,7 @@ const SpouseDropdown = ({
                 />
                 <div className="acm-flex-col">
                   <span>{p.name}</span>
+                  <span className="acm-muted">Female</span>
                 </div>
               </div>
             ))
@@ -494,7 +495,7 @@ const AddChildModal = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const dropdownAnchorRef = useRef<HTMLDivElement>(null);
+  const dropdownAnchorRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLDivElement>;
   const formId = useId();
 
   const showSpouseSection = form.isMarried;
@@ -566,7 +567,7 @@ const AddChildModal = ({
         .filter((p) =>
           p.name.toLowerCase().includes(spouseQuery.toLowerCase()),
         ),
-    [spouseQuery, persons],
+    [spouseQuery, persons, form.gender],
   );
 
   // ── Save ──────────────────────────────────────────────────────────────────
@@ -581,7 +582,7 @@ const AddChildModal = ({
       ...form,
       parents: parentId ? [parentId] : [],
       children: [],
-      spouse: selectedSpouse ? [selectedSpouse.id] : [],
+      spouse: selectedSpouse ? ([selectedSpouse.id] ) : [],
       isApproved: false,
       childrenData: [],
       spouseData: [],
@@ -730,7 +731,7 @@ const AddChildModal = ({
                     onSelect={(p) => {
                       setSelectedSpouse(p);
                       setSpouseQuery(p.name);
-                      setForm((prev) => ({ ...prev, spouse: [p.id] }));
+                      setForm((prev) => ({ ...prev, spouse: [p.id]  }));
                     }}
                     onClear={() => {
                       setSelectedSpouse(null);

@@ -18,6 +18,7 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
   const [childModal, setChildModal] = useState(false);
   const [parentModal, setParentModal] = useState(false);
   const [showChildren, setShowChildren] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
 
   const handleChildSave = (child: Family) => {
     onAddChild(person.id, child);
@@ -41,68 +42,72 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
     ["Spouse", spouse?.name ?? "—"],
     ["DOM", formatDate(person.dom)],
     ["Children", person.childrenData?.length ?? 0],
-    // ["Status", isDeceased ? "Deceased" : "Alive"],
   ];
 
   return (
     <div style={CardStyle.card}>
-      {/* ── Photo ─────────────────────────────────────────────────────── */}
-      <div style={CardStyle.photoWrapper}>
-        <div style={CardStyle.photoInner}>
-          <img
-            src={person.photo || DEFAULT_IMG}
-            alt={person.name}
-            style={CardStyle.photo}
-          />
-          {isDeceased && <MalaOverlay />}
-          <GenderBadge gender={person.gender} />
+      <button onClick={() => setShowDetails((v) => !v)}>
+        {/* ── Photo ─────────────────────────────────────────────────────── */}
+        <div style={CardStyle.photoWrapper}>
+          <div style={CardStyle.photoInner}>
+            <img
+              src={person.photo || DEFAULT_IMG}
+              alt={person.name}
+              style={CardStyle.photo}
+            />
+            {isDeceased && <MalaOverlay />}
+            <GenderBadge gender={person.gender} />
+          </div>
         </div>
-      </div>
+      </button>
 
       {/* ── Name ──────────────────────────────────────────────────────── */}
       <div style={CardStyle.name}>{person.name}</div>
-
-      {/* ── Details ───────────────────────────────────────────────────── */}
-      <div style={CardStyle.detailsBox}>
-        {details.map(([label, value]) => (
-          <div key={label} style={CardStyle.detailRow}>
-            <span style={CardStyle.detailLabel}>{label}</span>
-            <span style={CardStyle.detailValue}>{value}</span>
+      {showDetails && (
+        <>
+          {/* ── Details ───────────────────────────────────────────────────── */}
+          <div style={CardStyle.detailsBox}>
+            {details.map(([label, value]) => (
+              <div key={label} style={CardStyle.detailRow}>
+                <span style={CardStyle.detailLabel}>{label}</span>
+                <span style={CardStyle.detailValue}>{value}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      {/* ── DOM ───────────────────────────────────────────────────────── */}
-      {person.dod && (
-        <div style={CardStyle.date}>DOD: {formatDate(person.dom)}</div>
+          {/* ── DOM ───────────────────────────────────────────────────────── */}
+          {person.dod && (
+            <div style={CardStyle.date}>DOD: {formatDate(person.dom)}</div>
+          )}
+          {/* ── Actions ───────────────────────────────────────────────────── */}
+          <div style={CardStyle.actionGroup}>
+            <ActionBtn
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                setChildModal(true);
+              }}
+              icon="＋"
+              label="Add Child"
+            />
+            <ActionBtn
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                setParentModal(true);
+              }}
+              icon="↑"
+              label="Add Parent"
+            />
+            <ActionBtn
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                setShowChildren((v) => !v);
+              }}
+              icon="⇄"
+              label="Toggle Children"
+              variant="muted"
+            />
+          </div>
+        </>
       )}
-      {/* ── Actions ───────────────────────────────────────────────────── */}
-      <div style={CardStyle.actionGroup}>
-        <ActionBtn
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            setChildModal(true);
-          }}
-          icon="＋"
-          label="Add Child"
-        />
-        <ActionBtn
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            setParentModal(true);
-          }}
-          icon="↑"
-          label="Add Parent"
-        />
-        <ActionBtn
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            setShowChildren((v) => !v);
-          }}
-          icon="⇄"
-          label="Toggle Children"
-          variant="muted"
-        />
-      </div>
 
       {/* ── Modals ────────────────────────────────────────────────────── */}
       <AddChildModal
