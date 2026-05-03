@@ -17,7 +17,7 @@ const GroupPage = () => {
   const fetchGroup = async () => {
     const res = await fetch("/api/groups");
     const json = await res.json();
-    if (mounted) setGroup(json.data[0]);
+    if (mounted) setGroup(json?.data?.[0] || null);
   };
 
   fetchGroup();

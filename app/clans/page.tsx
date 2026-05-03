@@ -1,9 +1,10 @@
 "use client";
 import { ClansPage } from "../src/pages/ClansPage";
-const Clans = () => {
+import { Suspense } from "react";
+export default function Clans() {
   return (
-    <ClansPage/>
+    <Suspense fallback={<div>Loading...</div>}>
+      <ClansPage />
+    </Suspense>
   );
-};
-
-export default Clans;
+}
