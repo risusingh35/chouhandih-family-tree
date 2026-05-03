@@ -4,7 +4,7 @@ import AddChildModal from "../modal/AddChildModal";
 import MalaOverlay from "./MalaOverlay";
 import GenderBadge from "./GenderBadge";
 import ActionBtn from "./ActionBtn";
-import { CardStyle, COLORS } from "../constants/colors";
+import { CardStyle } from "../constants/colors";
 
 const DEFAULT_IMG = "/images/default.jpeg";
 // ─────────────────────────────────────────────────────────────────────────────
@@ -53,9 +53,8 @@ const Card = ({
 
   return (
     <div style={CardStyle.card}>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
+      <div
+        onClick={() => {
           onToggle();
         }}
       >
@@ -71,7 +70,7 @@ const Card = ({
             <GenderBadge gender={person.gender} />
           </div>
         </div>
-      </button>
+      </div>
 
       {/* ── Name ──────────────────────────────────────────────────────── */}
       <div style={CardStyle.name}>{person.name}</div>
