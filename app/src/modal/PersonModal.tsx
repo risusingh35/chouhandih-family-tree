@@ -53,7 +53,7 @@ const PersonModal = ({ person, isOpen, onClose }: Props) => {
           &times;
         </button>
 
-        {/* Person Details */}
+        {/* Family Details */}
         <div style={{ textAlign: "center" }}>
           <div
             style={{
@@ -81,9 +81,9 @@ const PersonModal = ({ person, isOpen, onClose }: Props) => {
           <div>
             <strong>DOB:</strong> {person.dob || "N/A"}
           </div>
-          {person.death && (
+          {person.dod && (
             <div>
-              <strong>Death:</strong> {person.death}
+              <strong>Death:</strong> {person.dod}
             </div>
           )}
           <div>

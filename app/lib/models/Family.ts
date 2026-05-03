@@ -1,29 +1,26 @@
-// lib/models/Person.ts
-
-import mongoose, { Schema, Document, Model } from "mongoose";
-
-/**
- * TypeScript Interface
- */
-export interface IPerson extends Document {
+import { Types, Document, Schema, model, models } from "mongoose";
+import { Vansh } from "./Vansh";
+export interface IFamily extends Document {
   name: string;
   gender: "M" | "F";
   photo: string;
   dob: Date;
-  death: Date | null;
+  dom: Date | null;
+  dod: Date | null;
   isMarried: boolean;
   isAlive: boolean;
   isApproved: boolean;
-  spouse: mongoose.Types.ObjectId[];
-  parents: mongoose.Types.ObjectId[];
-  children: mongoose.Types.ObjectId[];
-  approvedBy?: mongoose.Types.ObjectId | null;
+  spouse: Types.ObjectId[] | [];
+  parents: Types.ObjectId[];
+  children: Types.ObjectId[];
+  approvedBy?: Types.ObjectId | null;
+  vanshId?: Types.ObjectId | null;
 }
 
 /**
  * Schema
  */
-const PersonSchema: Schema<IPerson> = new Schema(
+const FamilySchema: Schema<IFamily> = new Schema(
   {
     name: {
       type: String,
@@ -48,7 +45,11 @@ const PersonSchema: Schema<IPerson> = new Schema(
       required: true,
     },
 
-    death: {
+    dom: {
+      type: Date,
+      default: null,
+    },
+    dod: {
       type: Date,
       default: null,
     },
@@ -67,31 +68,25 @@ const PersonSchema: Schema<IPerson> = new Schema(
       type: Boolean,
       default: false,
     },
-
-    /**
-     * Relations (Self referencing)
-     */
-    spouse: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Person",
-      },
-    ],
-
+    spouse: {
+      type: [Schema.Types.ObjectId],
+      ref: "Family",
+      default: [],
+    },
     parents: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Person",
+        ref: "Family",
       },
     ],
 
-    children: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Person",
-      },
-    ],
-
+    vanshId: {
+      type: Schema.Types.ObjectId,
+      ref: "Vansh",
+      required: true,
+      default: null,
+      index: true,
+    },
     /**
      * Approval reference (User/Admin)
      */
@@ -104,11 +99,7 @@ const PersonSchema: Schema<IPerson> = new Schema(
   {
     timestamps: true,
     versionKey: false,
+    strict: true, //  ensure unknown fields are removed
   }
 );
-
-/**
- * Prevent re-compilation in Next.js
- */
-export const PersonModel: Model<IPerson> =
-  mongoose.models.Person || mongoose.model<IPerson>("Person", PersonSchema);
+export const Family = models.Family || model("Family", FamilySchema);
