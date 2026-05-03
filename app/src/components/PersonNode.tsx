@@ -1,9 +1,28 @@
 "use client";
 
-import { useMemo, useRef, useEffect, useState, useCallback } from "react";
+import React, {
+  useMemo,
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  type JSX,
+} from "react";
 import Card from "./Card";
 import type { PersonNode as PersonNodeType, Family, ParentId } from "../types";
 import AddChildModal from "../modal/AddChildModal";
+
+interface SingleChildGroup {
+  type: "single";
+  members: [Family];
+}
+
+interface CoupleChildGroup {
+  type: "couple";
+  members: [Family, Family];
+}
+
+type GroupedChild = SingleChildGroup | CoupleChildGroup;
 
 interface Props {
   person: PersonNodeType;
@@ -11,6 +30,8 @@ interface Props {
   onAddChild: (parentId: ParentId, child: Family) => void;
   onAddParent: (childId: ParentId, parent: Family) => void;
   vanshId: string;
+  openCardId: string | null;
+  setOpenCardId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const PersonNode = ({
@@ -19,7 +40,9 @@ const PersonNode = ({
   vanshId,
   onAddChild,
   onAddParent,
-}: Props) => {
+  openCardId,
+  setOpenCardId,
+}: Props): JSX.Element => {
   const nodeRef = useRef<HTMLDivElement>(null);
   const [showActions, setShowActions] = useState(false);
   // ✅ GROUP CHILDREN AS COUPLE
@@ -69,13 +92,17 @@ const PersonNode = ({
       {/* PERSON */}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Card
-           key={person.id}
+          key={person.id}
           person={person}
           persons={persons}
           vanshId={vanshId}
           onClick={() => setShowActions((v) => !v)}
           onAddChild={onAddChild}
           onAddParent={onAddParent}
+          isOpen={openCardId === person.id}
+          onToggle={() =>
+            setOpenCardId((prev) => (prev === person.id ? null : person.id))
+          }
         />
       </div>
       {/* CONNECTOR */}
@@ -98,6 +125,8 @@ const PersonNode = ({
                     vanshId={vanshId}
                     onAddChild={onAddChild}
                     onAddParent={onAddParent}
+                    openCardId={openCardId}
+                    setOpenCardId={setOpenCardId}
                   />
                 ))}
               </div>
@@ -112,6 +141,8 @@ const PersonNode = ({
               vanshId={vanshId}
               onAddChild={onAddChild}
               onAddParent={onAddParent}
+              openCardId={openCardId}
+              setOpenCardId={setOpenCardId}
             />
           );
         })}

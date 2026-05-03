@@ -14,11 +14,18 @@ const formatDate = (dateStr: string) =>
 // ─────────────────────────────────────────────────────────────────────────────
 // Card
 // ─────────────────────────────────────────────────────────────────────────────
-const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
+const Card = ({
+  person,
+  persons,
+  vanshId,
+  onAddChild,
+  onAddParent,
+  isOpen,
+  onToggle,
+}: any) => {
   const [childModal, setChildModal] = useState(false);
   const [parentModal, setParentModal] = useState(false);
   const [showChildren, setShowChildren] = useState(true);
-  const [showDetails, setShowDetails] = useState(false);
 
   const handleChildSave = (child: Family) => {
     onAddChild(person.id, child);
@@ -46,7 +53,12 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
 
   return (
     <div style={CardStyle.card}>
-      <button onClick={() => setShowDetails((v) => !v)}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
+      >
         {/* ── Photo ─────────────────────────────────────────────────────── */}
         <div style={CardStyle.photoWrapper}>
           <div style={CardStyle.photoInner}>
@@ -63,7 +75,7 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
 
       {/* ── Name ──────────────────────────────────────────────────────── */}
       <div style={CardStyle.name}>{person.name}</div>
-      {showDetails && (
+      {isOpen && (
         <>
           {/* ── Details ───────────────────────────────────────────────────── */}
           <div style={CardStyle.detailsBox}>

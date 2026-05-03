@@ -17,7 +17,7 @@ export const FamilyPage = () => {
   const [persons, setPersons] = useState<Family[]>([]);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(true);
-
+  const [openCardId, setOpenCardId] = useState<string | null>(null);
   const handleAddPerson = (parentId: ParentId, child: Family) => {
     const addChild = async () => {
       await addChildToPersons(persons, parentId, child);
@@ -69,6 +69,8 @@ export const FamilyPage = () => {
         vanshId={vanshId}
         onAddChild={handleAddPerson}
         onAddParent={() => {}}
+        openCardId={openCardId}
+        setOpenCardId={setOpenCardId}
       />
     </div>
   );
