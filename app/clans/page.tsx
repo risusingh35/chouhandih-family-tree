@@ -1,7 +1,5 @@
-// import { ClansPage } from "app/src/pages/ClansPage";
-
+"use client";
 import { ClansPage } from "../src/pages/ClansPage";
-
 const Clans = () => {
   return (
     <ClansPage/>
