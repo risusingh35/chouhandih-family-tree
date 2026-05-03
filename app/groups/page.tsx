@@ -1,5 +1,6 @@
 "use client";
-import GroupPage from "app/src/pages/GroupPage";
+
+import GroupPage from "../src/pages/GroupPage";
 
 export default function Group() {
   return (
