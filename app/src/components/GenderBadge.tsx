@@ -15,7 +15,7 @@ const GenderBadge = ({ gender }: { gender: string }) => (
       fontSize: 11,
       lineHeight: 1,
       boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-      zIndex: 2,
+      zIndex: 4,
     }}
   >
     {gender === "M" ? "♂" : "♀"}

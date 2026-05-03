@@ -6,34 +6,19 @@ import {
   type Group,
   type Clan,
 } from "../../../public/data/groups";
+import { COLORS } from "../constants/colors";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface GroupSelectPageProps {
   onSelect: (groupId: string, clanId: string) => void;
 }
-
-// ─── Palette ──────────────────────────────────────────────────────────────────
-
-const C = {
-  cream: "#fffdf8",
-  parchment: "#fdf6ec",
-  sand: "#ddd4c5",
-  gold: "#c9a96e",
-  oak: "#a8845a",
-  umber: "#7a5c35",
-  bark: "#2c1f0e",
-  muted: "#9a8570",
-  warm100: "rgba(201,169,110,0.10)",
-  warm200: "rgba(201,169,110,0.22)",
-  warm300: "rgba(201,169,110,0.40)",
-};
-
-// ─── Ornament SVG ───────────────────────────────────────────────────────
 // ─── Vansh Badge ─────────────────────────────────────────────────────────────
 
 const VanshBadge = ({ vansh }: { vansh: Clan["vansh"] }) => {
-  const style = VANSH_COLOR[vansh];
+  console.log("vansh-------------------",vansh);
+  
+  const style = vansh;
   return (
     <span
       style={{
@@ -81,10 +66,10 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
         gap: 0,
         borderRadius: 18,
         overflow: "hidden",
-        border: `1.5px solid ${hovered ? clan.accent + "55" : C.sand}`,
+        border: `1.5px solid ${hovered ? clan.accent + "55" : COLORS.sand}`,
         background: hovered
           ? `linear-gradient(160deg, #fffdf8 0%, #fdf6ec 100%)`
-          : C.cream,
+          : COLORS.cream,
         boxShadow: hovered
           ? `0 16px 40px rgba(44,31,14,0.13), 0 2px 8px rgba(44,31,14,0.06)`
           : "0 2px 8px rgba(44,31,14,0.05)",
@@ -127,7 +112,7 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
                 fontFamily: "'Playfair Display', Georgia, serif",
                 fontSize: 20,
                 fontWeight: 600,
-                color: C.bark,
+                color: COLORS.bark,
                 lineHeight: 1.2,
               }}
             >
@@ -137,7 +122,7 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
               style={{
                 margin: "3px 0 0",
                 fontSize: 11,
-                color: C.muted,
+                color: COLORS.muted,
                 fontFamily: "'DM Sans', sans-serif",
                 letterSpacing: "0.04em",
               }}
@@ -170,11 +155,11 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
               alignItems: "center",
               gap: 6,
               fontSize: 11,
-              color: C.muted,
+              color: COLORS.muted,
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            <span aria-hidden style={{ color: C.gold }}>
+            <span aria-hidden style={{ color: COLORS.gold }}>
               📍
             </span>
             {clan.origin}
@@ -185,11 +170,11 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
               alignItems: "center",
               gap: 6,
               fontSize: 11,
-              color: C.muted,
+              color: COLORS.muted,
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            <span aria-hidden style={{ color: C.gold }}>
+            <span aria-hidden style={{ color: COLORS.gold }}>
               🙏
             </span>
             Kuldevi: {clan.kuldevi}
@@ -205,10 +190,10 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
                 style={{
                   padding: "2px 8px",
                   borderRadius: 20,
-                  background: C.warm100,
-                  border: `1px solid ${C.warm300}`,
+                  background: COLORS.warm100,
+                  border: `1px solid ${COLORS.warm300}`,
                   fontSize: 10,
-                  color: C.umber,
+                  color: COLORS.umber,
                   fontFamily: "'DM Sans', sans-serif",
                   fontWeight: 500,
                 }}
@@ -227,7 +212,7 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
             justifyContent: "space-between",
             marginTop: 4,
             paddingTop: 12,
-            borderTop: `1px solid ${C.sand}`,
+            borderTop: `1px solid ${COLORS.sand}`,
           }}
         >
           <span
@@ -236,7 +221,7 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
               fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: hovered ? clan.accent : C.muted,
+              color: hovered ? clan.accent : COLORS.muted,
               fontFamily: "'DM Sans', sans-serif",
               transition: "color 0.18s",
             }}
@@ -248,8 +233,8 @@ const ClanCard = ({ clan, onClick }: { clan: Clan; onClick: () => void }) => {
               width: 26,
               height: 26,
               borderRadius: "50%",
-              background: hovered ? clan.accent : C.warm200,
-              color: hovered ? "#fff" : C.umber,
+              background: hovered ? clan.accent : COLORS.warm200,
+              color: hovered ? "#fff" : COLORS.umber,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -300,14 +285,14 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
         @keyframes gs-fade-in   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         @keyframes gs-banner-in { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
 
-        .gs-search:focus { border-color: ${C.gold} !important; box-shadow: 0 0 0 3px rgba(201,169,110,0.18) !important; outline: none; }
-        .gs-tab:hover    { background: ${C.warm200} !important; }
+        .gs-search:focus { border-color: ${COLORS.gold} !important; box-shadow: 0 0 0 3px rgba(201,169,110,0.18) !important; outline: none; }
+        .gs-tab:hover    { background: ${COLORS.warm200} !important; }
       `}</style>
 
       <div
         style={{
           minHeight: "100vh",
-          background: `radial-gradient(ellipse at 50% -10%, #f0dfc0 0%, ${C.cream} 50%, #faf6f0 100%)`,
+          background: `radial-gradient(ellipse at 50% -10%, #f0dfc0 0%, ${COLORS.cream} 50%, #faf6f0 100%)`,
           fontFamily: "'DM Sans', sans-serif",
           position: "relative",
           overflowX: "hidden",
@@ -333,8 +318,8 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
             background: "rgba(253,250,245,0.9)",
             backdropFilter: "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
-            borderTop: `1px solid ${C.sand}`,
-            borderBottom: `1px solid ${C.sand}`,
+            borderTop: `1px solid ${COLORS.sand}`,
+            borderBottom: `1px solid ${COLORS.sand}`,
             padding: "12px 28px",
             display: "flex",
             alignItems: "center",
@@ -354,7 +339,7 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
                 top: "50%",
                 transform: "translateY(-50%)",
                 fontSize: 14,
-                color: C.muted,
+                color: COLORS.muted,
               }}
             >
               🔍
@@ -370,11 +355,11 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
                 width: "100%",
                 padding: "9px 12px 9px 34px",
                 borderRadius: 10,
-                border: `1.5px solid ${C.sand}`,
-                background: C.cream,
+                border: `1.5px solid ${COLORS.sand}`,
+                background: COLORS.cream,
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: 13,
-                color: C.bark,
+                color: COLORS.bark,
                 transition: "border-color 0.18s, box-shadow 0.18s",
               }}
             />
@@ -393,9 +378,9 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
                   style={{
                     padding: "7px 14px",
                     borderRadius: 8,
-                    border: `1.5px solid ${active ? C.gold : C.sand}`,
-                    background: active ? C.warm200 : "transparent",
-                    color: active ? C.umber : C.muted,
+                    border: `1.5px solid ${active ? COLORS.gold : COLORS.sand}`,
+                    background: active ? COLORS.warm200 : "transparent",
+                    color: active ? COLORS.umber : COLORS.muted,
                     cursor: "pointer",
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: 12,
@@ -419,7 +404,7 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
             style={{
               marginLeft: "auto",
               fontSize: 12,
-              color: C.muted,
+              color: COLORS.muted,
               fontWeight: 500,
               whiteSpace: "nowrap",
             }}
@@ -469,7 +454,7 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
               style={{
                 textAlign: "center",
                 padding: "60px 24px",
-                color: C.muted,
+                color: COLORS.muted,
                 animation: "gs-fade-in 0.3s ease forwards",
               }}
             >
@@ -493,9 +478,9 @@ const GroupSelectPage = ({ onSelect }: GroupSelectPageProps) => {
                   marginTop: 14,
                   padding: "9px 18px",
                   borderRadius: 9,
-                  border: `1.5px solid ${C.gold}`,
-                  background: C.warm100,
-                  color: C.umber,
+                  border: `1.5px solid ${COLORS.gold}`,
+                  background: COLORS.warm100,
+                  color: COLORS.umber,
                   cursor: "pointer",
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: 13,

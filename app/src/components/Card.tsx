@@ -91,10 +91,8 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
         fontFamily: "'DM Sans', sans-serif",
         padding: "14px 14px 12px",
         borderRadius: 16,
-        background: isDeceased
-          ? "linear-gradient(160deg, #f5f0e8 0%, #ede6d6 100%)"
-          : "#ffffff",
-        border: isDeceased ? "1.5px solid #c9b97a" : "1.5px solid #e2e8f0",
+        background: "linear-gradient(160deg, #f5f0e8 0%, #ede6d6 100%)",
+        border: "1.5px solid #c9b97a",
         minWidth: 160,
         maxWidth: 200,
         cursor: "pointer",
@@ -103,33 +101,12 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
         position: "relative",
       }}
     >
-      {/* DECEASED BANNER */}
-      {isDeceased && (
-        <div
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            background: "linear-gradient(135deg, #78350f, #92400e)",
-            color: "#fef3c7",
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            padding: "2px 7px",
-            borderRadius: 20,
-            textTransform: "uppercase",
-            zIndex: 3,
-          }}
-        >
-          Deceased
-        </div>
-      )}
       {/* PHOTO + BADGES */}
       <div
         style={{
           display: "flex",
           justifyContent: "center",
-          marginBottom: 10,
+          marginBottom: 20,
         }}
       >
         <div style={{ position: "relative", width: 72, height: 72 }}>
@@ -142,10 +119,8 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
               borderRadius: "50%",
               objectFit: "cover",
               display: "block",
-              filter: isDeceased ? "grayscale(60%) brightness(0.88)" : "none",
-              border: isDeceased
-                ? "2.5px solid #b8972a"
-                : "2.5px solid #e2e8f0",
+              filter: "grayscale(60%) brightness(0.88)",
+              border: "2.5px solid #b8972a",
               transition: "filter 0.2s, border 0.2s",
             }}
           />
@@ -163,7 +138,7 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
           textAlign: "center",
           fontWeight: 700,
           fontSize: 14,
-          color: isDeceased ? "#78350f" : "#1e293b",
+          color: "#78350f",
           letterSpacing: "-0.01em",
           lineHeight: 1.3,
           marginBottom: 4,
@@ -189,7 +164,7 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
         <>
           <div
             style={{
-              background: isDeceased ? "rgba(180,150,60,0.08)" : "#f8fafc",
+              background: "rgba(180,150,60,0.08)",
               borderRadius: 10,
               padding: "8px 10px",
               marginBottom: 10,
@@ -218,10 +193,7 @@ const Card = ({ person, persons, vanshId, onAddChild, onAddParent }: any) => {
                 <span
                   style={{
                     fontWeight: 600,
-                    color:
-                      label === "Status" && !person.isAlive
-                        ? "#b45309"
-                        : "#1e293b",
+                    color: "#b45309",
                   }}
                 >
                   {value}

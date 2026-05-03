@@ -45,10 +45,10 @@ const ropeD = flowers
       viewBox={`0 0 ${SVG} ${SVG}`}
       style={{
         position: "absolute",
-        top: -10,
-        left: -10,
-        width: SVG,
-        height: SVG,
+        top: -11,
+        left: -11,
+        width: "99px",
+        height: "99px",
         pointerEvents: "none",
         zIndex: 3,
         overflow: "visible", // allow petals near edges to render

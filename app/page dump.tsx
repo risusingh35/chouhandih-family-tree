@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import GroupSelectPage from "./src/components/GroupSelectPage";
+import GroupSelectPage from "./src/components/GroupSelectPageDump";
 import FamilyTreeView from "./src/components/FamilytreeviewDump";
 import personsData from "../public/data/family.json";
 import type { Family } from "./src/types";
