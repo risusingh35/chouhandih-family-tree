@@ -1,14 +1,3 @@
-/**
- * MalaOverlay
- *
- * Renders a marigold garland that drapes over the top and down both sides
- * of the circular photo frame — exactly like a real Indian memorial photo.
- *
- * The SVG is 92 × 92, positioned at top:-10 / left:-10 so it extends
- * 10 px beyond every edge of the 72 × 72 photo container.
- * The parent div must NOT have overflow:hidden (default is visible — fine).
- */
-
 const MalaOverlay = () => {
   // ── geometry ──────────────────────────────────────────────────────────
   const SVG = 92; // rendered SVG size (px)

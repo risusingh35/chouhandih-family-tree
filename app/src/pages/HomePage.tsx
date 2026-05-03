@@ -1,9 +1,9 @@
-import Groups from "app/groups/page";
+import GroupPage from './GroupPage';
 
 export const HomePage = () => {
   return (
     <>
-      <Groups />
+      <GroupPage />
     </>
   );
 };

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { Clan } from "app/lib/models/Clans";
+// import { Clan } from "app/lib/models/Clans";
 import type { ApiResponse } from "../../lib/type/api";
+import { Clan } from "@/app/lib/models/Clans";
 
 export async function GET(request: NextRequest) {
   try {

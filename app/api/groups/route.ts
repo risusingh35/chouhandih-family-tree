@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createDoc, getDocs } from "../../lib/crud";
 import type { ApiResponse } from "../../lib/type/api";
-import { Group } from "app/lib/models/Group";
-import type { IGroup } from "app/src/types";
+import { Group, type IGroup } from "@/app/lib/models/Group";
+// import { Group } from "app/lib/models/Group";
+// import type { IGroup } from "app/src/types";
 
 // ── GET /api/groups ────────────────────────────────────────────────────────────
 export async function GET(request: NextRequest) {
