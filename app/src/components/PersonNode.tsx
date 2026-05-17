@@ -42,6 +42,7 @@ const PersonNode = ({
     width: number;
   } | null>(null);
 
+
 const spouse = useMemo(() => person.spouseData?.[0] ?? null, [person.spouseData]);
 const children = useMemo(() => person.childrenData ?? [], [person.childrenData]);
 
