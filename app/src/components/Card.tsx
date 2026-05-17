@@ -47,7 +47,6 @@ const Card = ({
     ["DOM", formatDate(person.dom)],
     ["Children", person.childrenData?.length ?? 0],
   ];
-
   return (
     <div style={CardStyle.card}>
       <div
@@ -88,31 +87,35 @@ const Card = ({
           )}
           {/* ── Actions ───────────────────────────────────────────────────── */}
           <div style={CardStyle.actionGroup}>
-            <ActionBtn
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                setChildModal(true);
-              }}
-              icon="＋"
-              label="Add Child"
-            />
-            <ActionBtn
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                setParentModal(true);
-              }}
-              icon="↑"
-              label="Add Parent"
-            />
-            <ActionBtn
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                setShowChildren((v) => !v);
-              }}
-              icon="⇄"
-              label="Toggle Children"
-              variant="muted"
-            />
+            {person.isMarried && person.gender == "M" && (
+              <>
+                <ActionBtn
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    setChildModal(true);
+                  }}
+                  icon="＋"
+                  label="Add Child"
+                />
+                {/* <ActionBtn
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    setParentModal(true);
+                  }}
+                  icon="↑"
+                  label="Add Parent"
+                /> */}
+                <ActionBtn
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    setShowChildren((v) => !v);
+                  }}
+                  icon="⇄"
+                  label="Toggle Children"
+                  variant="muted"
+                />
+              </>
+            )}
           </div>
         </>
       )}
