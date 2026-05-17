@@ -216,8 +216,7 @@ const GroupPage = () => {
               marginTop: 38,
               padding: "14px 40px",
               border: "1.5px solid #c28c1c",
-              background:
-                "linear-gradient(135deg, #d6a12f 0%, #b27a12 100%)",
+              background: "linear-gradient(135deg, #d6a12f 0%, #b27a12 100%)",
               color: "#fff",
               cursor: "pointer",
               borderRadius: 6,
@@ -335,7 +334,6 @@ const GroupPage = () => {
           >
             "{group.quote?.text}"
             <br />
-
             <span
               style={{
                 fontSize: 12,
