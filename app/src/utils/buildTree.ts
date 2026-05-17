@@ -8,39 +8,70 @@ export function buildTree(persons: Family[]): PersonNode | null {
 
   const map: Record<string, PersonNode> = {};
 
-  // ─── Init ─────────────────────────────
+  // ─── Init ──────────────────────────────────────────────────
   persons.forEach((p) => {
-    map[p.id] = {
-      ...p,
-      childrenData: [],
-      parentData: [],
-      spouseData: [],
-    };
+    map[p.id] = { ...p, childrenData: [], parentData: [], spouseData: [] };
   });
 
-  // ─── Build Parent + Children ──────────
+  // ─── Spouse data ───────────────────────────────────────────
   persons.forEach((p) => {
-    const node = map[p.id];
+    map[p.id].spouseData = (p.spouse ?? [])
+      .map((id) => map[id])
+      .filter(Boolean);
+  });
 
-    // parents
-    node.parentData =
-      p.parents?.map((id) => map[id]).filter(Boolean) || [];
+  // ─── Group candidates by parent ───────────────────────────
+  const candidatesByParent: Record<string, Family[]> = {};
+  persons.forEach((p) => {
+    (p.parents ?? []).forEach((parentId) => {
+      if (!candidatesByParent[parentId]) candidatesByParent[parentId] = [];
+      candidatesByParent[parentId].push(p);
+    });
+  });
 
-    // 🔥 derive children (with duplicate protection)
-    p.parents?.forEach((parentId) => {
-      if (map[parentId]) {
-        const parent = map[parentId];
+  // ─── Build true children (exclude married-in spouses) ─────
+  Object.entries(candidatesByParent).forEach(([parentId, group]) => {
+    if (!map[parentId]) return;
+    const parent = map[parentId];
 
-        // ✅ prevent duplicate child push
-        if (!parent.childrenData.some((c) => c.id === node.id)) {
-          parent.childrenData.push(node);
+    // Find every ID that should be excluded:
+    // If two people in this group are mutual spouses → exclude the married-in one
+    const toExclude = new Set<string>();
+
+    group.forEach((p) => {
+      (p.spouse ?? []).forEach((spouseId) => {
+        const partner = group.find((g) => g.id === spouseId);
+        if (!partner) return; // spouse not in this parent group → ignore
+
+        // Determine who married in:
+        // Male lineage → exclude the female
+        // Same gender  → exclude lexicographically larger ID (deterministic)
+        if (p.gender === "F" && partner.gender === "M") {
+          toExclude.add(p.id);
+        } else if (p.gender === "M" && partner.gender === "F") {
+          toExclude.add(partner.id);
+        } else {
+          toExclude.add(p.id > partner.id ? p.id : partner.id);
         }
+      });
+    });
+
+    // Push only true children
+    group.forEach((p) => {
+      if (toExclude.has(p.id)) return;
+      const node = map[p.id];
+
+      if (!node.parentData?.some((pd) => pd.id === parent.id)) {
+        node.parentData?.push(parent);
+      }
+      if (!parent.childrenData.some((c) => c.id === node.id)) {
+        parent.childrenData.push(node);
       }
     });
   });
-  // ─── Root Detection ───────────────────
-  const root = persons.find((p) => !p.parents?.length);
 
+  // ─── Root ──────────────────────────────────────────────────
+  const root = persons.find((p) => !p.parents?.length);
   return root ? map[root.id] : null;
 }
 
