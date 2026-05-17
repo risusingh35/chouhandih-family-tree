@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { buildTree, addChildToPersons } from "../utils/buildTree";
 import PersonNode from "../components/PersonNode";
 import type { Family, ParentId } from "../types";
+import { Loader } from "../components/ui/Loader";
 
 export const FamilyPage = () => {
   const searchParams = useSearchParams();
@@ -52,7 +53,7 @@ export const FamilyPage = () => {
 
   const tree = useMemo(() => buildTree(persons), [persons]);
 
-  if (loading) return <div style={{ padding: 40 }}>Loading...</div>;
+  if (loading) return <Loader />;
   if (!tree) return <div>No Data</div>;
 
   return (

@@ -67,17 +67,40 @@ interface FieldProps {
 }
 
 const Field = ({ label, required, error, htmlFor, children }: FieldProps) => (
-  <div className="acm-field">
+  <div
+    className="acm-field"
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start", // 🔥 forces left alignment
+      width: "100%",
+    }}
+  >
     <label
       htmlFor={htmlFor}
       className={`acm-label ${error ? "acm-label-error" : ""}`}
+      style={{
+        display: "block", // 🔥 prevents inline behavior
+        width: "100%", // 🔥 full width
+        textAlign: "left", // 🔥 force left align
+      }}
     >
       {label}
       {required && <span className="acm-required">*</span>}
     </label>
-    {children}
+
+    <div style={{ width: "100%" }}>{children}</div>
+
     {error && (
-      <span role="alert" className="acm-error">
+      <span
+        role="alert"
+        className="acm-error"
+        style={{
+          display: "block",
+          width: "100%",
+          textAlign: "left", // 🔥 fix error alignment too
+        }}
+      >
         {error}
       </span>
     )}
@@ -307,11 +330,23 @@ interface PhotoPreviewProps {
 const PhotoPreview = ({ url, onChange }: PhotoPreviewProps) => {
   const [imgError, setImgError] = useState(false);
 
-  // reset error when url changes
   useEffect(() => setImgError(false), [url]);
 
   return (
     <div className="acm-photo-row">
+      {/* 🔒 Hidden but still in DOM */}
+      <div style={{ display: "none" }}>
+        <Field label="Photo URL">
+          <input
+            name="photo"
+            value={url}
+            onChange={(e) => onChange(e.target.value)}
+            className="acm-input"
+          />
+        </Field>
+      </div>
+
+      {/* ✅ Visible preview */}
       <div className="acm-avatar">
         {!imgError && url ? (
           <img src={url} alt="Preview" onError={() => setImgError(true)} />
@@ -319,15 +354,6 @@ const PhotoPreview = ({ url, onChange }: PhotoPreviewProps) => {
           <span>👤</span>
         )}
       </div>
-      <Field label="Photo URL">
-        <input
-          name="photo"
-          value={url}
-          onChange={(e) => onChange(e.target.value)}
-          className="acm-input"
-          placeholder="https://…"
-        />
-      </Field>
     </div>
   );
 };
@@ -495,7 +521,9 @@ const AddChildModal = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const dropdownAnchorRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLDivElement>;
+  const dropdownAnchorRef = useRef<HTMLDivElement>(
+    null,
+  ) as React.MutableRefObject<HTMLDivElement>;
   const formId = useId();
 
   const showSpouseSection = form.isMarried;
@@ -582,7 +610,7 @@ const AddChildModal = ({
       ...form,
       parents: parentId ? [parentId] : [],
       children: [],
-      spouse: selectedSpouse ? ([selectedSpouse.id] ) : [],
+      spouse: selectedSpouse ? [selectedSpouse.id] : [],
       isApproved: false,
       childrenData: [],
       spouseData: [],
@@ -731,7 +759,7 @@ const AddChildModal = ({
                     onSelect={(p) => {
                       setSelectedSpouse(p);
                       setSpouseQuery(p.name);
-                      setForm((prev) => ({ ...prev, spouse: [p.id]  }));
+                      setForm((prev) => ({ ...prev, spouse: [p.id] }));
                     }}
                     onClear={() => {
                       setSelectedSpouse(null);

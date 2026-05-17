@@ -7,13 +7,10 @@ import ActionBtn from "./ActionBtn";
 import { CardStyle } from "../constants/colors";
 
 const DEFAULT_IMG = "/images/default.jpeg";
-// ─────────────────────────────────────────────────────────────────────────────
+// Date formatter
 const formatDate = (dateStr: string) =>
   dateStr ? new Date(dateStr).toDateString() : "";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Card
-// ─────────────────────────────────────────────────────────────────────────────
 const Card = ({
   person,
   persons,
